@@ -37,3 +37,27 @@ def getOffDiagMatrix(thick=1):
       if 0 <= i < 100 and 0 <= j < 100:
         a[i][j] = 5
   return a
+
+def getOffDiagMatrixII(thick=1):
+  a = np.ones((1, 100))[0]
+  m = np.diag(a, 0)
+  for t in xrange(1, thick+1):
+    b = np.ones((1, 100-t))[0]
+    m += np.diag(b, -t) + np.diag(b, t)
+  return m
+
+def getOffDiagMatrixIII(thick=1, nBreak=0):
+  a = np.ones((1, 100))[0]
+  m = np.diag(a, 0)
+  for t in xrange(1, thick+1):
+    b = np.ones((1, 100-t))[0]
+    m += np.diag(b, -t) + np.diag(b, t)
+
+  mybreak, idx, leng = np.zeros((len(m[0]),6)), 1, len(m[0])/nBreak
+  while idx*leng < len(m[0]):
+    m[:,idx*leng-3:idx*leng+3] = mybreak
+    idx += 1
+  return m
+
+
+
