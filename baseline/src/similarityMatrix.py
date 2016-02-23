@@ -21,7 +21,7 @@ def getCircleMatrix():
   mask = img.astype(bool)
   img = img.astype(float)
 
-  img += 1 + 0.1 * np.random.randn(*img.shape)
+  # img += 1 + 0.1 * np.random.randn(*img.shape)
   return img
 
 def getDiagMatrix():
