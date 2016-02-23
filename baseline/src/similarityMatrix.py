@@ -5,9 +5,9 @@ def getCircleMatrix():
   l = 100
   x, y = np.indices((l, l))
 
-  center1 = (28, 24)
+  center1 = (28, 28)
   center2 = (40, 50)
-  center3 = (67, 58)
+  center3 = (58, 58)
   center4 = (24, 70)
 
   radius1, radius2, radius3, radius4 = 16, 14, 5, 14
@@ -46,7 +46,26 @@ def getOffDiagMatrixII(thick=1):
     m += np.diag(b, -t) + np.diag(b, t)
   return m
 
+#Similar to getOffDiagMatrixIV, different cutting. is symmetric
 def getOffDiagMatrixIII(thick=1, nBreak=0):
+  a = np.ones((1, 100))[0]
+  m = np.diag(a, 0)
+
+  leng = len(m[0])/nBreak
+  for t in xrange(1, thick+1):
+    idx = 0
+    b = np.ones((1, 100-t))[0]
+    while idx*leng < len(m[0]):
+      try:
+        b[idx*leng-3:idx*leng+3-t] = 0
+      except:
+        break
+      idx += 1
+    m += np.diag(b, -t) + np.diag(b, t)
+  return m
+
+#Similar to getOffDiagMatrixIII, but different cutting. not symmetric
+def getOffDiagMatrixIV(thick=1, nBreak=0):
   a = np.ones((1, 100))[0]
   m = np.diag(a, 0)
   for t in xrange(1, thick+1):
@@ -58,6 +77,4 @@ def getOffDiagMatrixIII(thick=1, nBreak=0):
     m[:,idx*leng-3:idx*leng+3] = mybreak
     idx += 1
   return m
-
-
 
