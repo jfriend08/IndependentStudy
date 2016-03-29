@@ -3,3 +3,7 @@
 ._*
 .ipynb_checkpoints
 .pyc
+.log
+.fls
+.fdb_latexmk
+.aux
