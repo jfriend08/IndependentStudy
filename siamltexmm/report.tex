@@ -63,8 +63,26 @@ Here is the baseline approach which can be roughtly divided into two parts: the 
   \STATE L = scipy.sparse.csgraph.laplacian()
   \STATE eigVals, eigVecs = np.linalg.eig(L)
   \STATE Y = getMthSmallest(eigVals, eigVecs, m)
+  \STATE return boundaryDetection(Y)
 \end{algorithmic}
 \end{algorithm}
+
+
+\subsection{Symmetric and Laplacian Matrix}
+Hi2sub!
+\begin{figure}[H]
+  \centering
+    \includegraphics[width=0.5\textwidth]{./figure/similarityMatrix.png}
+  \caption{The training and test accuracy with epochs}
+\end{figure}
+
+\subsection{Boundary Detection}
+As the pseudocode in Algorithm 2, once the Laplacian matrix is constructed, each row is the representation of eigen-features at specific time. Therefore, running k-means for eigen-features of all time points will yield the results of which centroids of this time point belongs to, and therefore the place where the $t_{i} \neq t_{i+1}$ is where the boundary is. As showed in figure 3.1, boundary is correctly detected at each time point, but when doing experiments I noticed the initiation and number of iteration during k-means will affect the correctness of boundary, and the more iteration usually will gives better boundary.
+\begin{figure}[H]
+  \centering
+    \includegraphics[width=0.3\textwidth]{./figure/o3_boundary.png}
+  \caption{The original symmetric matrix and detected boundary}
+\end{figure}
 
 \begin{algorithm}[htb]
   \caption{boundaryDetection}
@@ -73,21 +91,15 @@ Here is the baseline approach which can be roughtly divided into two parts: the 
   \SetKwInOut{Output: }{Boundary b, Centroids c}
   \label{algo:SC}
 \begin{algorithmic}[1]
-  \STATE M = getSymmetricMatrix()
-  \STATE L = scipy.sparse.csgraph.laplacian()
-  \STATE eigVals, eigVecs = np.linalg.eig(L)
-  \STATE Y = getMthSmallest(eigVals, eigVecs, m)
+  \STATE $ \overline y_i = \frac{Y_i}{\parallel Y \parallel}$ //normalize each row $Y_i$
+  \STATE Run k-means on $\{ \overline y_i \}_{i=1}^{n}$
+  \STATE Let $c_i$ denote the cluster containing $ \overline y_i$
+  \STATE $b \leftarrow \{ i|c_i \neq c_{i+1}\}$
+  \STATE return b, c
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Hi2sub}
-Hi2sub!
 
-\begin{figure}[H]
-  \centering
-    \includegraphics[width=0.5\textwidth]{./figure/similarityMatrix.png}
-  \caption{The training and test accuracy with epochs}
-\end{figure}
 
 
 \subsection{ToDos}
