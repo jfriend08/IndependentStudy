@@ -52,6 +52,33 @@ Hi2!
 
 \\
 \section{Baseline Approach}
+Here is the baseline approach which can be roughtly divided into two parts: the first part is constructing symmetric matrix from the feature similarity along time, and the second part is to construct symmetric normalized Laplacian matrix and obtain the top $m$ eigenvectors with the top $m$ smallest eigenvalues, and then perform k-means for boundary detection.
+
+\begin{algorithm}[htb]
+  \caption{Baseline Approach}
+  \SetKwInOut{Input: }{number of top $m$ smallest eigenvalues}
+  \label{algo:SC}
+\begin{algorithmic}[1]
+  \STATE M = getSymmetricMatrix()
+  \STATE L = scipy.sparse.csgraph.laplacian()
+  \STATE eigVals, eigVecs = np.linalg.eig(L)
+  \STATE Y = getMthSmallest(eigVals, eigVecs, m)
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[htb]
+  \caption{boundaryDetection}
+  \SetKwInOut{Input: }{Laplacian eigenvectors $Y \in \mathbb{R^{n \times m}}$}
+
+  \SetKwInOut{Output: }{Boundary b, Centroids c}
+  \label{algo:SC}
+\begin{algorithmic}[1]
+  \STATE M = getSymmetricMatrix()
+  \STATE L = scipy.sparse.csgraph.laplacian()
+  \STATE eigVals, eigVecs = np.linalg.eig(L)
+  \STATE Y = getMthSmallest(eigVals, eigVecs, m)
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Hi2sub}
 Hi2sub!
@@ -72,7 +99,7 @@ Hi3!
 \bibitem{fpf} {\sc Deep clustering: Discriminative embeddings for
 segmentation and separation}
 \bibitem{fpf} {\sc Learning Deep Representations for Graph Clustering}
-
+\bibitem{fpf} {\sc Hierarchical Evaluation of Segment Boundary Detection}
 \end{thebibliography}
 
 \end{document}
