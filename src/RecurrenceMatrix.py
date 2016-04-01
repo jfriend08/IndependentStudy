@@ -9,3 +9,12 @@ def construct(labels):
         R[i][j] = 1
         R[j][i] = 1
   return R
+
+def adjacentMatrix(size):
+  res = np.array([ [0]*size for _ in xrange(size)])
+  for i in xrange(size):
+    if i-1 >=0:
+      res[i][i-1] = 1
+    if i+1 < size:
+      res[i][i+1] = 1
+  return res
