@@ -36,9 +36,9 @@
 \begin{document}
 \maketitle
 
-\begin{abstract}
+\begin{Note}
 This is independent study mid-way report
-\end{abstract}
+\end{Note}
 
 \pagestyle{myheadings}
 \thispagestyle{plain}
@@ -47,12 +47,8 @@ This is independent study mid-way report
 There are many approaches to understand the structure of music, and this is a project applying spectral graph theory with Laplacian formula to analyze repeated patterns in musical recordings. Starting with low-dimensional encoding of repeating structure, hierarchical relationship among repeating components will be built by changing number of eigenvectors. Further works for this project will include Neural Network and back-propagation to apply thie technique to analyze the structure of wide variety of musics.
 
 \\
-\section{Introduction}
-Hi2!
-
-\\
 \section{Baseline Approach}
-Here is the baseline approach which can be roughtly divided into two parts: the first part is constructing \textit{sequence-augmented affinity matrix A} from \textit{symmetric matrix R} of the feature similarity at each time points, and the second part is to construct symmetric normalized Laplacian matrix and obtain the top $m$ eigenvectors with the top $m$ smallest eigenvalues, and then perform k-means for boundary detection. The high level pseudocode is described in Algorithm 1.
+Here is the baseline approach which can be roughtly divided into two parts: the goal of the first part is constructing \textit{sequence-augmented affinity matrix A} from \textit{symmetric matrix R} of the feature similarity at each time points, and the second part is to construct symmetric normalized Laplacian matrix and obtain the top $m$ eigenvectors with the $m$ smallest eigenvalues, and then perform k-means for boundary detection. The high level pseudocode is described in Algorithm 1.
 
 \begin{algorithm}[htb]
   \caption{Baseline Approach}
@@ -73,7 +69,7 @@ Initially symmetric matrix is constructed manually, and the symmetric properity 
 \begin{equation}
 L = I - D^{-1/2}AD^{-1/2}
 \end{equation}
-The properity of symmetric is important as it shows the correlation between time $i$ and $j$ which is an undirected graph, and the proterity is important to hold to make sure the eigenvectors calculated from Laplacian matrix is done correctly. Figure 3.1 shows the example of symmetrix matrix and its corresponding top-10 eignevectors, and method is implemented from Algoritm 1.
+The properity of symmetric is important as it shows the correlation between time $i$ and $j$ which is an undirected graph, and the proterity is important to hold to make sure the eigenvectors calculated from Laplacian matrix is done correctly. Figure 2.1 shows the example of symmetrix matrix and its corresponding top-10 eignevectors, and method is implemented from Algoritm 1.
 
 \begin{figure}[H]
 \centering
@@ -87,9 +83,9 @@ The properity of symmetric is important as it shows the correlation between time
   \end{tabular}{}
 \begin{subfigure}
 \end{subfigure}
-\caption{Symmetric matrix and eigen vectors. Left: four different type of symmetirc matrix, and Right: the top-10 eigen vectors}
+\caption{Symmetric matrixs and corresponding eigen vectors. Left: four different type of symmetirc matrix, and Right: the top-10 eigen vectors}
 \end{figure}
-Interestingly, eigenvectors are like the building blocks of the original matrix, and the signal of each eigenvector are like showing the correlation of each time point in this building block. As the top-m eigenvectors matrix $Y$ constructed, we can notice from Figure 3.2 that the dot product of $YY^T$ is similar to the original symmetric matrix. I think understand the properity of eigenvector is important, as the each row from $Y$ is similar to the eigen-feature representation at each time point, and therefore we can perform k-means for boundary base on $Y$ as illustrated in Algorithm 2.
+Interestingly, eigenvectors are like the building blocks of the original graph, and the signal of each eigenvector are like showing the correlation of each time point in this building block. As the top-m eigenvectors matrix $Y$ constructed, we can notice from Figure 2.2 that the dot product of $YY^T$ is similar to the original symmetric matrix. I think understand the properity of eigenvector is important, as the each row from $Y$ is similar to the eigen-feature representation at each time point, and therefore we can perform k-means for boundary base on $Y$ as illustrated in Algorithm 2.
 \begin{figure}[H]
   \centering
     \includegraphics[width=0.8\textwidth]{./figure/o3_eachStage.png}
@@ -98,7 +94,7 @@ Interestingly, eigenvectors are like the building blocks of the original matrix,
 
 
 \subsection{Boundary Detection}
-As the pseudocode in Algorithm 2, once the Laplacian matrix is constructed, each row is the representation of eigen-features at specific time. Therefore, running k-means for eigen-features of all time points will yield the results of which centroids of this time point belongs to, and therefore the place where the $t_{i} \neq t_{i+1}$ is where the boundary is. As showed in figure 3.3, boundary is correctly detected at each time point, but when doing experiments I noticed the number of iteration during k-means will affect the correctness of boundary, and the more iteration usually gives better boundary.
+As the pseudocode in Algorithm 2, once the Laplacian matrix is constructed, each row is the representation of eigen-features at specific time. Therefore, running k-means for eigen-features of all time points will yield the results of which centroids of this time point belongs to, and therefore the place where the $t_{i} \neq t_{i+1}$ is where the boundary is. As showed in Figure 2.3, boundary is correctly detected at each time point, but when doing experiments I noticed the number of iteration during k-means will affect the correctness of boundary, and the more iteration usually gives better boundary.
 \begin{figure}[H]
 \centering
 \begin{subfigure}
@@ -130,7 +126,24 @@ As the pseudocode in Algorithm 2, once the Laplacian matrix is constructed, each
 \end{algorithm}
 
 \subsection{Affinity Matrix from Real Music}
-As basic process is established above, I started to construct matrix from real music, and the music I started with is \textit{The Beatles - Come Together}. Data is sampled in the rate of 22050Hz, and transformed to .wav format, as it can be imported by scipy. Imported signal has two track, and all following analysis is based on the first track, and feature extraction is done by librosa cqt computing the constant-Q transform of an audio signal. As we get too little information at low frequencies and too much information at highfrequencies if we just simply double the frequency for Fourier transformation[Ref 6], and cqt will be better suit for extracting feature from music signal because it spaced the center frequencies of the frequency bins geometrically, and all Q-factors are all equal[Ref 7]. The \textit{ affinity matrix A} is constructed by:
+As basic process is established above, I started to construct matrix from real music, and the music I started with is \textit{The Beatles - Come Together}. Data is sampled in the rate of 22050Hz, and transformed to .wav format, as it can be imported by scipy. Imported signal has two tracks, and all following analysis is based on the first track, and feature extraction is done by librosa cqt computing the constant-Q transform of an audio signal. As we will get too little information at low frequencies and too much information at high frequencies if we just simply double the frequency for Fourier transformation[Ref 6], and cqt will be better suit for extracting feature from music signal because it spaced the center frequencies of the frequency bins geometrically, and Q-factors are all equal[Ref 7]. As we can see from Figure 2.4, feature extraction from mfcc and cqt is different and seems cqt is able to cpature long-range repeating form.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}
+  \begin{tabular}{c}
+  \includegraphics[width=40mm]{./figure/cqt.png}
+  \end{tabular}{}
+\end{subfigure}
+  \begin{tabular}{c}
+  \includegraphics[width=40mm]{./figure/mfcc.png}
+  \end{tabular}{}
+\begin{subfigure}
+\end{subfigure}
+\caption{Visualization of matrix in Figure 2.3 after Left: cqt and Right: mfcc feature extraction}
+\end{figure}
+
+The \textit{affinity matrix A} is constructed by:
 \begin{equation}
 A_{ij} = \mu R^{\prime}_{ij}S^{rep}_{ij} + (1-\mu)\Delta_{ij}S^{loc}_{ij}
 \end{equation}
@@ -138,12 +151,25 @@ where $R_{ij}$ is recurrence matrix and $R[i][j]$ is 1 if time $i$ and $j$ are m
 \begin{equation}
 G(M) = S_{ij} = exp\left( {-1\over2\sigma^2} \|x_i-x_j\|^2  \right) \textbf{, for each row of i and j in M}
 \end{equation}
-and $S^{rep}_{ij} = G(R^{\prime}_{ij})$ and $S^{loc}_{ij} = G(\Delta_{ij})$, and $\mu$ is Equation 3.2 is a factor balancing local and global linkage, and optimal of $\mu$ is solved by:
+and $S^{rep}_{ij} = G(R^{\prime}_{ij})$ and $S^{loc}_{ij} = G(\Delta_{ij})$, and $\mu$ in Equation 2.2 is a factor balancing local and global linkage, and optimal of $\mu$ is solved by:
 \begin{equation}
 \mu^{\ast} = {<d(\delta), d(R^{\prime})+d(\delta) >\over \|d(r^{\prime})+d(\delta)\|^2}
 \end{equation}
-where we treat the input matrix as vector of degree-sum where $d(\cdot)=[d_i(\cdot)]^n_{i=1}$, and $d_i(G) = \Sigma_jG_{ij}$ is the degree sum at time $i$. However, after the $affinity matrix A$ being constructed from Equation 3.2, we loss the symmetric proerity, eventhough R^{\prime}_{ij}, S^{rep}_{ij}, \Delta_{ij}, and S^{loc}_{ij} are symmetric. The dot product from Equation 3.2 is not symmetric, and there the addition modification may be required.
+where we treat the input matrix as vector of degree-sum where $d(\cdot)=[d_i(\cdot)]^n_{i=1}$, and $d_i(G) = \Sigma_jG_{ij}$ is the degree sum at time $i$. However, after the affinity matrix $A$ being constructed from Equation 2.2, we loss the symmetric proerity, even though $R^{\prime}_{ij}, S^{rep}_{ij}, \Delta_{ij}, S^{loc}_{ij}$ are symmetric. The product from matrix multiplication from Equation 2.2 is not symmetric, and the addition modification may be required. Figure 2.5 is the visulization for $R$, $A$, and $Y$ with the top 25 eigenvectors.
 
+\begin{figure}[H]
+  \centering
+    \includegraphics[width=1\textwidth]{./figure/allMatrix.png}
+  \caption{First 1000 time point of recurrence and affinity matrix, and first 25 eigenvectors for The Beatles - Come Together}
+\end{figure}
+
+
+\subsection{Discussion}
+Here is the section for discussion about the current issues.\\
+The first issue is about the time complexity. Input signal of a 3 minutes music contains 6291012 data points and still 12288 points after mfcc or cqt, which gives us a recurrent matrix $R$ in shape of (12288, 12288). For a graph matrix like this big shape will give a hard time for visualizing the whole matrix, as well as spending lots of time on calculations like Equation 2.3 which is an $O(n^2)$. Also, np.linalg.eig, line 3 in Algorithm 1 is requiring computation time, and line 4 in Algorithm 1 also requiring sorting since the returned eigen value form line 3 doen't guarantee in sorted order. I think these complexity is one of the reason that motivate Ref 4 to use encode and decode method, but the advantage of our method is able to understange the hierarchical structure which is different from Ref 4. The majority vote method mentioned in Ref 2 maybe will be a way to reduce the shape of the matrix, but addition clarification may needed to implement this method.\\
+The second issue is about the construction of affinity matrix $A$ in Equation 2.2. We loss the symmetric properity after $A$ constructed, mainly due to the fact that matrix multiplication is not guarantee the symmetric properity.
+
+\subsection{Further Works}
 
 \begin{thebibliography}{10}
 \bibitem{fpf} {\sc A Tutorial on Spectral Clustering}
