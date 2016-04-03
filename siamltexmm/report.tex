@@ -30,8 +30,8 @@
 \def\bfE{\mbox{\boldmath$E$}}
 \def\bfG{\mbox{\boldmath$G$}}
 
-\title{Independent Study}
-\author{Yun-shao Sung\thanks{\tt yss265@nyu.edu} }
+\title{Independent Study -- Song Structure with Spectral Clustering}
+\author{Peter Yun-shao Sung\thanks{\tt yss265@nyu.edu} }
 
 \begin{document}
 \maketitle
@@ -56,7 +56,7 @@ Here is the baseline approach which can be roughtly divided into two parts: the 
   \label{algo:SC}
 \begin{algorithmic}[1]
   \STATE M = getSymmetricMatrix() //to get affinity matrix
-  \STATE L = scipy.sparse.csgraph.laplacian() //to get symmetric normalized Laplacian matrix
+  \STATE L = scipy.sparse.csgraph.laplacian(M) //to get symmetric normalized Laplacian matrix
   \STATE eigVals, eigVecs = np.linalg.eig(L)
   \STATE Y = getMthSmallest(eigVals, eigVecs, m)
   \STATE return boundaryDetection(Y)
@@ -85,16 +85,16 @@ The properity of symmetric is important as it shows the correlation between time
 \end{subfigure}
 \caption{Symmetric matrixs and corresponding eigen vectors. Left: four different type of symmetirc matrix, and Right: the top-10 eigen vectors}
 \end{figure}
-Interestingly, eigenvectors are like the building blocks of the original graph, and the signal of each eigenvector are like showing the correlation of each time point in this building block. As the top-m eigenvectors matrix $Y$ constructed, we can notice from Figure 2.2 that the dot product of $YY^T$ is similar to the original symmetric matrix. I think understand the properity of eigenvector is important, as the each row from $Y$ is similar to the eigen-feature representation at each time point, and therefore we can perform k-means for boundary base on $Y$ as illustrated in Algorithm 2.
+Interestingly, eigenvectors are like the building blocks of the original graph, and the signal of each eigenvector are like showing the correlation of each time point in this building block. As the top-m eigenvectors matrix $Y$ constructed, we can notice from Figure 2.2 that the dot product of $YY^T$ is similar to the original symmetric matrix, although in low-resolution way but a good fit to the purpose of finding the structure. I think understand the properity of eigenvector is important, as the each row from $Y$ is similar to the eigen-feature representation at each time point, and therefore we can perform k-means for boundary detection based on $Y$ as illustrated in Algorithm 2.
 \begin{figure}[H]
   \centering
     \includegraphics[width=0.8\textwidth]{./figure/o3_eachStage.png}
-  \caption{The steps from symmetric matrix to eigenvector}
+  \caption{The steps from symmetric matrix to eigenvector: R, Y, $YY^T$}
 \end{figure}
 
 
 \subsection{Boundary Detection}
-As the pseudocode in Algorithm 2, once the Laplacian matrix is constructed, each row is the representation of eigen-features at specific time. Therefore, running k-means for eigen-features of all time points will yield the results of which centroids of this time point belongs to, and therefore the place where the $t_{i} \neq t_{i+1}$ is where the boundary is. As showed in Figure 2.3, boundary is correctly detected at each time point, but when doing experiments I noticed the number of iteration during k-means will affect the correctness of boundary, and the more iteration usually gives better boundary.
+As the pseudocode shown in Algorithm 2, once the Laplacian matrix is constructed, each row is the representation of eigen-features at specific time. Therefore, running k-means for eigen-features of all time points will yield the results of which centroids of this time point belongs to, and therefore the place where the $t_{i} \neq t_{i+1}$ is where the boundary is. As showed in Figure 2.3, boundary is correctly detected at each time point, but when doing experiments I noticed the number of iteration during k-means will affect the correctness of boundary, and the more iteration usually gives better boundary.
 \begin{figure}[H]
 \centering
 \begin{subfigure}
@@ -140,7 +140,7 @@ As basic process is established above, I started to construct matrix from real m
   \end{tabular}{}
 \begin{subfigure}
 \end{subfigure}
-\caption{Visualization of matrix in Figure 2.3 after Left: cqt and Right: mfcc feature extraction}
+\caption{Visualization of recurrence graph $R$ from matrix in Figure 2.3 after Left: cqt and Right: mfcc feature extraction}
 \end{figure}
 
 The \textit{affinity matrix A} is constructed by:
