@@ -164,12 +164,24 @@ where we treat the input matrix as vector of degree-sum where $d(\cdot)=[d_i(\cd
 \end{figure}
 
 
-\subsection{Discussion}
+\section{Discussion}
 Here is the section for discussion about the current issues.\\
 The first issue is about the time complexity. Input signal of a 3 minutes music contains 6291012 data points and still 12288 points after mfcc or cqt, which gives us a recurrent matrix $R$ in shape of (12288, 12288). For a graph matrix like this big shape will give a hard time for visualizing the whole matrix, as well as spending lots of time on calculations like Equation 2.3 which is an $O(n^2)$. Also, np.linalg.eig, line 3 in Algorithm 1 is requiring computation time, and line 4 in Algorithm 1 also requiring sorting since the returned eigen value form line 3 doen't guarantee in sorted order. I think these complexity is one of the reason that motivate Ref 4 to use encode and decode method, but the advantage of our method is able to understange the hierarchical structure which is different from Ref 4. The majority vote method mentioned in Ref 2 maybe will be a way to reduce the shape of the matrix, but addition clarification may needed to implement this method.\\
 The second issue is about the construction of affinity matrix $A$ in Equation 2.2. We loss the symmetric properity after $A$ constructed, mainly due to the fact that matrix multiplication is not guarantee the symmetric properity.
 
-\subsection{Further Works}
+\section{Further Works}
+The goal of this project is to further construct \textit{Convolutional Neural Network} (CNN) on-top of the Laplacian formula that we have constructed above. There are many different approaches using techniques like decode-encode and embeddings in Ref 8 and Ref 3 respectively. However, although the methods can successfully perform boundary detection and maybe efficient than Laplacian, I think we will loss hierarchical meaning if we are using their method.
+
+Dr. LeCun's paper in Ref 8 described method for Multiresolution Analysis on Graphs for data with weak geometric structure, and there they also extend the analysis via Laplacian Spectrum. Although the method may related to our works, addtional evaluation may need to make sure we can apply thier method to perform boundary detection on musical recording as well as preserving its hierchical meaning.
+
+In a web tutorial that explaining the CNN architecture for Spotify music recommendation, they performed multiple convolutional layers followed by fully connected networks. I think the convulutional layworks is worth trying since many of the filters pick up, or emphasize, harmonic content Figure 2.6, and maybe we can extract the features after several convolutional layers and form an Laplacian matrix for boundary detection. The idea to add fully connect layers is still not quite clear to me since the output from there will be only one vector which is not possible to form Laplacian matrix and perform boundary detection.
+\begin{figure}[H]
+  \centering
+    \includegraphics[width=0.5\textwidth]{./figure/spotify_convnet.png}
+    \includegraphics[width=0.7\textwidth]{./figure/filters_hires.png}
+  \caption{Top: Convolutional neural network architectures at \url{http://benanne.github.io/2014/08/05/spotify-cnns.html}. Bottom: Visualization of the filters learned in the first convolutional layer}
+\end{figure}
+
 
 \begin{thebibliography}{10}
 \bibitem{fpf} {\sc A Tutorial on Spectral Clustering}
@@ -180,6 +192,7 @@ segmentation and separation}
 \bibitem{fpf} {\sc Hierarchical Evaluation of Segment Boundary Detection}
 \bibitem{fpf} {\sc Calculation of a Constant Q Spectral Transformation}
 \bibitem{fpf} {\sc Constant-Q Transform Toolbox for Music Processing}
+\bibitem{fpf} {\sc Spectral Networks and Deep Locally Connected Networks on Graphs}
 \end{thebibliography}
 
 \end{document}
