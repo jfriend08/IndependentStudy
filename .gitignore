@@ -8,3 +8,7 @@
 *.fdb_latexmk
 *.aux
 *npy
+*.synctex.gz
+*bst
+*cls
+*clo
