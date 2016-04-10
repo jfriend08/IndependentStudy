@@ -5,6 +5,7 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{mathtools}
+\usepackage{amsmath}
 
 % \usepackage[demo]{graphicx}
 % \usepackage{subfig}
@@ -50,7 +51,7 @@ D is degree matrix defined as the diagnal matrix with degrees $d_1, d_2, \ldots,
 d_i = \displaystyle\sum_{i \neq j}^{n} w_{ij}
 \end{equation}
 Althought the condition of $i \neq j$ is not emphasized in [1], but this is the condition when I checked scipy.sparse.csgraph.laplacian.\\
-Here is the setps to calculate equation 1.1
+Here is the steps to calculate equation 1.1
 \begin{equation}
 D^{1 \over 2}W D^{1 \over 2} =
 \begin{pmatrix}
@@ -86,8 +87,56 @@ and can be generalized as followed:
 \begin{equation}
 L_{i,j} =
 \begin{cases}
-  {-w_{i,j} \over \sqrt{d_i,d_j}}       & \quad \text{if } i \neq j\\
-  1 - {w_{i,j} \over d_i}  & \quad \text{if } i = j\\
+  {-w_{i,j} \over \sqrt{d_id_j}}       & \quad \text{if } i \neq j\\
+  1 - {w_{i,j} \over d_i}  & \quad \text{if } i = j \text{, not-scipy}\\
+  1   & \quad \text{if } i = j \text{, scipy}\\
+\end{cases}
+\end{equation}
+
+\section{Derivative of Laplacian formula}
+Now if we would like to take derivative of Laplacian w.r.t variable $w_{i,j}$ in the symmetric matrix $W$. Basically the components $L_{i,k}$, $L_{k,i}$, $L_{k,j}$, $L_{j,k}$, $L_{i,j}$, and $L_{j,i}$, where $k \neq i, k \neq j$ will need to consider. \\
+For position $L_{i,j}$, where $i \neq j$:
+\begin{equation}
+\begin{aligned}
+L_{i,j} &= L_{j,i} =  {-w_{i,j} \over \sqrt{d_id_j}} \\
+{\partial L_{i,j} \over \partial w_{i,j}} &= {\partial L_{j,i} \over \partial w_{i,j}} = {-1 \over \sqrt{d_id_j}} + {w_{i,j} \over 2(d_id_i)^{3\over 2}}({\partial d_i \over \partial w_{i,j}}d_j + d_i{\partial d_j \over \partial w_{i,j}}) \\
+&= {-1 \over \sqrt{d_id_j}} + {w_{i,j}(d_i+d_j) \over 2(d_id_i)^{3\over 2}}
+\end{aligned}
+\end{equation}
+For position $L_{i,j}$, where $i = j$:
+\begin{equation}
+\begin{aligned}
+L_{i,j} &=  1 - {w_{i,j} \over d_i} \\
+{\partial L_{i,j} \over \partial w_{i,j}} &= -(d_i)^{-1} + w_{i,j}(d_i)^{-2}{\partial d_i\over \partial w_{i,j}} \\
+&= {w_{i,j}-d_i \over d_i^2}
+\end{aligned}
+\end{equation}
+For position $L_{i,k}$, where $k \neq i$ and $k \neq j$:
+\begin{equation}
+\begin{aligned}
+L_{i,k} &= L_{k,i} =  {-w_{i,k} \over \sqrt{d_id_k}} \\
+{\partial L_{i,k} \over \partial w_{i,j}} &= {\partial L_{k,i} \over \partial w_{i,j}} = {w_{i,k} \over 2\sqrt{d_k}d_i^{3\over2}}
+\end{aligned}
+\end{equation}
+For position $L_{k,j}$, where $k \neq i$ and $k \neq j$:
+\begin{equation}
+\begin{aligned}
+L_{k,j} &= L_{j,k} =  {-w_{j,k} \over \sqrt{d_jd_k}} \\
+{\partial L_{k,j} \over \partial w_{i,j}} &= {\partial L_{j,k} \over \partial w_{i,j}} = {w_{j,k} \over 2\sqrt{d_k}d_j^{3\over2}}
+\end{aligned}
+\end{equation}
+Therefore the generalized results is as followed:
+\begin{equation}
+{\partial L \over \partial w_{i,j}} =
+\begin{cases}
+  {w_{i,j}-d_i \over d_i^2}       & \quad \text{if } i = j \text{, for position (i,j), not-scipy}\\
+  0       & \quad \text{if } i = j \text{, for position (i,j), scipy}\\
+  {-1 \over \sqrt{d_id_j}} + {w_{i,j}(d_i+d_j) \over 2(d_id_i)^{3\over 2}}  & \quad \text{if } i \neq j \text{, for position (i,j) and (j,i)}\\
+  {w_{i,k} \over 2\sqrt{d_k}d_i^{3\over2}} & \quad \text{if } k\neq i \,\&\, k \neq j \text{, for position (i,k) and (k,i)} \\
+  {w_{j,k} \over 2\sqrt{d_k}d_j^{3\over2}} & \quad \text{if } k\neq i \,\&\, k \neq j \text{, for position (k,j) and (j,k)} \\
+  {w_{i,k}-d_i \over d_i^2}       & \quad \text{if } k = i \text{, for position (i,i), not-scipy}\\
+  {w_{j,k}-d_i \over d_j^2}       & \quad \text{if } k = j \text{, for position (j,j), not-scipy}\\
+  0 & \quad \text{for any other position} \\
 \end{cases}
 \end{equation}
 
