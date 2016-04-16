@@ -1,5 +1,6 @@
 import numpy as np
-import math
+import math, jams
+import librosa
 
 def construct(labels):
   a = np.ones((1, labels.shape[0]))[0]
@@ -60,8 +61,22 @@ def feature2GaussianMatrix(feature, sigma):
       m[j,i] = val
   return m
 
+def getIntervalFromJAMS(path):
+  j = jams.load(path)
+  res = []
+  for i in zip(list(j.annotations[0].data.time), list(j.annotations[0].data.time + j.annotations[0].data.duration), j.annotations[0].data.value):
+    v = [[librosa.time_to_frames([i[0].total_seconds(), i[1].total_seconds()]), i[2].encode("ascii")]]
+    print v
+    res += v
+  return res
+
+def label2RecurrenceMatrix(intervals):
+  intervals = getIntervalFromJAMS
+  pass
+
 # # m = np.zeros((40, 84))
 # m = np.matrix([[1,2,3],[2,2,4], [1,2,3], [2,2,4], [1,2,3]])
 # print feature2GaussianMatrix(m, 1)
+# getIntervalFromJAMS("../data/2.jams")
 
 
