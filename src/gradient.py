@@ -64,13 +64,13 @@ def analyticalGradient(m, x, y):
   return res
 
 
-m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
-# m = np.ones((5,5))
-# print m
-# print getLaplacianMatrix(m)
+# m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
+# # m = np.ones((5,5))
+# # print m
+# # print getLaplacianMatrix(m)
 
-# L, d= scipy.sparse.csgraph.laplacian(m, normed=True, return_diag=True)
-# print L
-dL_num = numericalGradient(m, 1,2)
-dL_ana = analyticalGradient(m, 1,2)
-print "all diff are below 1e-10: ", np.all((dL_num-dL_ana)<1e-10)
+# # L, d= scipy.sparse.csgraph.laplacian(m, normed=True, return_diag=True)
+# # print L
+# dL_num = numericalGradient(m, 1,2)
+# dL_ana = analyticalGradient(m, 1,2)
+# print "all diff are below 1e-10: ", np.all((dL_num-dL_ana)<1e-10)

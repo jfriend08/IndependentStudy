@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 def construct(labels):
   a = np.ones((1, labels.shape[0]))[0]
@@ -26,7 +27,6 @@ def sumEachRow(m):
     res[i] = m[i,:]
   return res
 
-
 def getBalancedMiu(R, delta):
   d_R = np.apply_along_axis(sum, 1, R)
   d_delta = np.apply_along_axis(sum, 1, delta)
@@ -43,10 +43,20 @@ def gaussianKernel(m, c=0.5):
       res[j][i] = val
   return res
 
-# delta = adjacentMatrix(10)
-# res = gaussianKernel(delta)
-# print res
+def feature2GaussianMatrix(feature, sigma):
+  nSample, nFeature = feature.shape
+  a = np.ones((1, nSample))[0]
+  m = np.diag(a, 0)
+  for i in xrange(nSample):
+    for j in xrange(i+1, nSample):
+      diff = np.power(np.linalg.norm(feature[i]-feature[j]),2)
+      val = np.exp(-diff/sigma**2)
+      m[i,j] = val
+      m[j,i] = val
+  return m
 
-
+# # m = np.zeros((40, 84))
+# m = np.matrix([[1,2,3],[2,2,4], [1,2,3], [2,2,4], [1,2,3]])
+# print feature2GaussianMatrix(m, 1)
 
 

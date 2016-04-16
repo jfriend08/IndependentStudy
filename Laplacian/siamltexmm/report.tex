@@ -149,7 +149,7 @@ for $w_{ij}$, where $i = j$:
 \begin{equation}
 {\partial L \over \partial w_{i,j}} =
 \begin{cases}
-  {w_{i,j}-d_i \over d_i^2}       & \quad \text{, for position $(k,k)$, where $k = i$ or $k = j$, not-scipy}\\
+  {w_{i,j}-d_i \over d_i^2}       & \quad \text{, for position $(k,k)$, where $k = i = j$, not-scipy}\\
   0       & \quad \text{, for position $(k,k)$, where $k = i$ or $k = j$, scipy}\\
   {w_{i,k} \over 2\sqrt{d_k}d_i^{3\over2}}       & \quad \text{, for all position $(i,k), (k,i)$, where $k \neq i$}\\
   {w_{j,k} \over 2\sqrt{d_k}d_j^{3\over2}}       & \quad \text{, for all position $(j,k), (k,j)$, where $k \neq j$}\\
