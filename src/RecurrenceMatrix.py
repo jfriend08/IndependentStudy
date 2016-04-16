@@ -44,6 +44,11 @@ def gaussianKernel(m, c=0.5):
   return res
 
 def feature2GaussianMatrix(feature, sigma):
+  '''
+  @para {feature}: feature matrix in shape of (nSample, nFeature)
+  @para {sigma}: learnable parameter to calculate gaussian similarity
+  @para {return}: recurrence similarity matrix
+  '''
   nSample, nFeature = feature.shape
   a = np.ones((1, nSample))[0]
   m = np.diag(a, 0)
