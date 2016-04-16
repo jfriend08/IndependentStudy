@@ -66,14 +66,27 @@ def getIntervalFromJAMS(path):
   res = []
   for i in zip(list(j.annotations[0].data.time), list(j.annotations[0].data.time + j.annotations[0].data.duration), j.annotations[0].data.value):
     v = [[librosa.time_to_frames([i[0].total_seconds(), i[1].total_seconds()]), i[2].encode("ascii")]]
-    print v
     res += v
   return res
 
-def label2RecurrenceMatrix(intervals):
-  intervals = getIntervalFromJAMS
-  pass
-
+def label2RecurrenceMatrix(jamsPath, matrixSize):
+  intervals = getIntervalFromJAMS(jamsPath)
+  a = np.ones((1, matrixSize))[0]
+  m = np.diag(a, 0)
+  allterms = {}
+  for i, term in intervals:
+    if term in allterms:
+      allterms[term] += range(i[0], i[1]+1)
+    else:
+      allterms[term] = range(i[0], i[1]+1)
+  for k in allterms:
+    times = allterms[k]
+    for i in xrange(len(times)):
+      for j in xrange(i+1, len(times)):
+        t1, t2 = times[i], times[j]
+        m[t1,t2] = 1
+        m[t2,t1] = 1
+  return m
 # # m = np.zeros((40, 84))
 # m = np.matrix([[1,2,3],[2,2,4], [1,2,3], [2,2,4], [1,2,3]])
 # print feature2GaussianMatrix(m, 1)
