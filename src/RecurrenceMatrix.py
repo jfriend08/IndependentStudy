@@ -60,6 +60,9 @@ def feature2GaussianMatrix(feature, sigmas):
   @para {sigmas}: learnable parameter to calculate gaussian similarity
   @para {return}: recurrence similarity matrix
   '''
+  if not (gm==np.transpose(gm)).all():
+    raise ValueError('input sigmas matrix not symmetirc')
+
   nSample, nFeature = feature.shape
   a = np.ones((1, nSample))[0]
   m = np.diag(a, 0)
