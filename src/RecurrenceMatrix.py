@@ -3,6 +3,9 @@ import math, jams
 import librosa
 
 def construct(labels):
+  '''
+  Construct recurrence matrix from kmeans labels
+  '''
   a = np.ones((1, labels.shape[0]))[0]
   R = np.diag(a, 0)
   for i in xrange(len(labels)-1):
@@ -13,6 +16,9 @@ def construct(labels):
   return R
 
 def adjacentMatrix(size):
+  '''
+  Building adjacent matrix as the paper mentioned
+  '''
   res = np.array([ [0.0]*size for _ in xrange(size)])
   for i in xrange(size):
     if i-1 >=0:
@@ -29,6 +35,9 @@ def sumEachRow(m):
   return res
 
 def getBalancedMiu(R, delta):
+  '''
+  Calculate the miu to balance the linkage of recurrence and adjacent matrix
+  '''
   d_R = np.apply_along_axis(sum, 1, R)
   d_delta = np.apply_along_axis(sum, 1, delta)
   return np.dot(d_R,d_R+d_delta)/np.power(np.linalg.norm(d_R + d_delta), 2)
@@ -46,6 +55,7 @@ def gaussianKernel(m, c=0.5):
 
 def feature2GaussianMatrix(feature, sigma):
   '''
+  Given features along time frame, and returnning the pair-wise gaussian similarity
   @para {feature}: feature matrix in shape of (nSample, nFeature)
   @para {sigma}: learnable parameter to calculate gaussian similarity
   @para {return}: recurrence similarity matrix
