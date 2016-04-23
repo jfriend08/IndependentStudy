@@ -53,11 +53,11 @@ def gaussianKernel(m, c=0.5):
       res[j][i] = val
   return res
 
-def feature2GaussianMatrix(feature, sigma):
+def feature2GaussianMatrix(feature, sigmas):
   '''
   Given features along time frame, and returnning the pair-wise gaussian similarity
   @para {feature}: feature matrix in shape of (nSample, nFeature)
-  @para {sigma}: learnable parameter to calculate gaussian similarity
+  @para {sigmas}: learnable parameter to calculate gaussian similarity
   @para {return}: recurrence similarity matrix
   '''
   nSample, nFeature = feature.shape
@@ -66,7 +66,7 @@ def feature2GaussianMatrix(feature, sigma):
   for i in xrange(nSample):
     for j in xrange(i+1, nSample):
       diff = np.power(np.linalg.norm(feature[i]-feature[j]),2)
-      val = np.exp(-diff/sigma**2)
+      val = np.exp(-diff/sigmas[i,j]**2)
       m[i,j] = val
       m[j,i] = val
   return m
