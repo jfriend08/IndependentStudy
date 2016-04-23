@@ -69,17 +69,18 @@ def getIntervalFromJAMS(path):
     res += v
   return res
 
-def label2RecurrenceMatrix(jamsPath, matrixSize):
-  intervals = getIntervalFromJAMS(jamsPath)
+def label2RecurrenceMatrix(jamsPath, matrixSize, intervals=[]):
+  if len(intervals) == 0:
+    intervals = getIntervalFromJAMS(jamsPath)
   a = np.ones((1, matrixSize))[0]
   m = np.diag(a, 0)
-  allterms = {}
+  allterms = {} #collecting all terms and its corresponding intervals
   for i, term in intervals:
     if term in allterms:
       allterms[term] += range(i[0], i[1]+1)
     else:
       allterms[term] = range(i[0], i[1]+1)
-  for k in allterms:
+  for k in allterms: #marking 1 for all pair of time points in interval
     times = allterms[k]
     for i in xrange(len(times)):
       for j in xrange(i+1, len(times)):
@@ -87,9 +88,10 @@ def label2RecurrenceMatrix(jamsPath, matrixSize):
         m[t1,t2] = 1
         m[t2,t1] = 1
   return m
+
 # # m = np.zeros((40, 84))
 # m = np.matrix([[1,2,3],[2,2,4], [1,2,3], [2,2,4], [1,2,3]])
 # print feature2GaussianMatrix(m, 1)
-# getIntervalFromJAMS("../data/2.jams")
+getIntervalFromJAMS("../data/2.jams")
 
 
