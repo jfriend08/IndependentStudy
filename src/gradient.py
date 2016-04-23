@@ -21,8 +21,8 @@ def numericalGradient(m, x, y):
   limx, limy = m.shape
   if x > limx or y > limy:
     raise ValueError('Position outside matrix')
-  if x == y:
-    raise ValueError('Cannot no self weighting')
+  # if x == y:
+  #   raise ValueError('Cannot no self weighting')
   d = 1e-6
   f1, f2 = np.copy(m), np.copy(m)
   f1[x,y] += d
@@ -30,6 +30,7 @@ def numericalGradient(m, x, y):
   f2[x,y] -= d
   f2[y,x] -= d
   l1, l2 = getLaplacianMatrix(f1), getLaplacianMatrix(f2)
+  # l1, l2 = scipy.sparse.csgraph.laplacian(f1), scipy.sparse.csgraph.laplacian(f2)
   # L1, d1= scipy.sparse.csgraph.laplacian(f1, normed=True, return_diag=True)
   # L2, d2= scipy.sparse.csgraph.laplacian(f2, normed=True, return_diag=True)
   return (l1-l2)/(2*d)
@@ -38,8 +39,8 @@ def analyticalGradient(m, x, y):
   limx, limy = m.shape
   if x > limx or y > limy:
     raise ValueError('Position outside matrix')
-  if x == y:
-    raise ValueError('Cannot no self weighting')
+  # if x == y:
+  #   raise ValueError('Cannot no self weighting')
 
   g = np.array(m)
   np.fill_diagonal(g, 0)
@@ -63,6 +64,28 @@ def analyticalGradient(m, x, y):
         res[j,i] = val
   return res
 
+def f1(x):
+  return 4./(x)**2
+def df1(x):
+  return -8./(x**3)
+
+def w_ij(i, j, sij, feature):
+  diff = np.linalg.norm(feature[i]-feature[j])
+  val = np.exp(-((diff/sij)**2))
+  return val
+
+def dw_ij(i, j, sij, feature):
+  orig = w_ij(i, j, sij, feature)
+  diff = np.linalg.norm(feature[i]-feature[j])
+  return (2*orig*diff**2)/(sij**3)
+
+m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
+
+s = 2
+print (w_ij(0,1,s+1e-6,m) - w_ij(0,1,s-1e-6,m))/(2*1e-6)
+print dw_ij(0,1,s,m)
+
+
 
 # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
 # # m = np.ones((5,5))
@@ -71,6 +94,8 @@ def analyticalGradient(m, x, y):
 
 # # L, d= scipy.sparse.csgraph.laplacian(m, normed=True, return_diag=True)
 # # print L
-# dL_num = numericalGradient(m, 1,2)
-# dL_ana = analyticalGradient(m, 1,2)
-# print "all diff are below 1e-10: ", np.all((dL_num-dL_ana)<1e-10)
+for i in xrange(len(m)):
+  for j in xrange(len(m)):
+    dL_num = numericalGradient(m, i,j)
+    dL_ana = analyticalGradient(m, i,j)
+    print "all diff are below 1e-10: ", np.all((dL_num-dL_ana)<1e-10)
