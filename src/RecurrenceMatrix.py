@@ -1,6 +1,9 @@
 import numpy as np
-import math, jams
+import math, jams, sys
 import librosa
+
+sys.path.append('../src')
+import gradient
 
 def construct(labels):
   '''
@@ -60,7 +63,7 @@ def feature2GaussianMatrix(feature, sigmas):
   @para {sigmas}: learnable parameter to calculate gaussian similarity
   @para {return}: recurrence similarity matrix
   '''
-  if not (gm==np.transpose(gm)).all():
+  if not (sigmas==np.transpose(sigmas)).all():
     raise ValueError('input sigmas matrix not symmetirc')
 
   nSample, nFeature = feature.shape
@@ -68,8 +71,9 @@ def feature2GaussianMatrix(feature, sigmas):
   m = np.diag(a, 0)
   for i in xrange(nSample):
     for j in xrange(i+1, nSample):
-      diff = np.power(np.linalg.norm(feature[i]-feature[j]),2)
-      val = np.exp(-diff/sigmas[i,j]**2)
+      # diff = np.power(np.linalg.norm(feature[i]-feature[j]),2)
+      # val = np.exp(-diff/sigmas[i,j]**2)
+      val = gradient.w_ij(i, j, sigmas[i,j], feature) #call value from gradient module
       m[i,j] = val
       m[j,i] = val
   return m

@@ -79,23 +79,23 @@ def dw_ij(i, j, sij, feature):
   diff = np.linalg.norm(feature[i]-feature[j])
   return (2*orig*diff**2)/(sij**3)
 
-m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
-
-s = 2
-print (w_ij(0,1,s+1e-6,m) - w_ij(0,1,s-1e-6,m))/(2*1e-6)
-print dw_ij(0,1,s,m)
-
-
-
 # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
-# # m = np.ones((5,5))
-# # print m
-# # print getLaplacianMatrix(m)
 
-# # L, d= scipy.sparse.csgraph.laplacian(m, normed=True, return_diag=True)
-# # print L
-for i in xrange(len(m)):
-  for j in xrange(len(m)):
-    dL_num = numericalGradient(m, i,j)
-    dL_ana = analyticalGradient(m, i,j)
-    print "all diff are below 1e-10: ", np.all((dL_num-dL_ana)<1e-10)
+# s = 2
+# print (w_ij(0,1,s+1e-6,m) - w_ij(0,1,s-1e-6,m))/(2*1e-6)
+# print dw_ij(0,1,s,m)
+
+
+
+# # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
+# # # m = np.ones((5,5))
+# # # print m
+# # # print getLaplacianMatrix(m)
+
+# # # L, d= scipy.sparse.csgraph.laplacian(m, normed=True, return_diag=True)
+# # # print L
+# for i in xrange(len(m)):
+#   for j in xrange(len(m)):
+#     dL_num = numericalGradient(m, i,j)
+#     dL_ana = analyticalGradient(m, i,j)
+#     print "all diff are below 1e-10: ", np.all((dL_num-dL_ana)<1e-10)
