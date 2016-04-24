@@ -1,6 +1,7 @@
 import numpy as np
-import math, jams, sys
+import math, sys
 import librosa
+import jams
 
 sys.path.append('../src')
 import gradient
@@ -106,9 +107,19 @@ def label2RecurrenceMatrix(jamsPath, matrixSize, intervals=[]):
         m[t2,t1] = 1
   return m
 
+def allDLoss(sigma, L, L_true, features):
+  # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
+  accu = np.zeros(m.shape)
+  for i in xrange(len(m)):
+    for j in xrange(len(m)):
+      accu += gradient.L_numericalGradient(m,i,j) * gradient.dw_ij(i,j,sigma,features)
+  return accu
+
+# allLoss(1, 1, 1)
+
 # # m = np.zeros((40, 84))
 # m = np.matrix([[1,2,3],[2,2,4], [1,2,3], [2,2,4], [1,2,3]])
 # print feature2GaussianMatrix(m, 1)
-getIntervalFromJAMS("../data/2.jams")
+# getIntervalFromJAMS("../data/2.jams")
 
 

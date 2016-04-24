@@ -17,7 +17,7 @@ def getLaplacianMatrix(m):
   np.fill_diagonal(res, 1)
   return res
 
-def numericalGradient(m, x, y):
+def L_numericalGradient(m, x, y):
   limx, limy = m.shape
   if x > limx or y > limy:
     raise ValueError('Position outside matrix')
@@ -35,7 +35,7 @@ def numericalGradient(m, x, y):
   # L2, d2= scipy.sparse.csgraph.laplacian(f2, normed=True, return_diag=True)
   return (l1-l2)/(2*d)
 
-def analyticalGradient(m, x, y):
+def L_analyticalGradient(m, x, y):
   limx, limy = m.shape
   if x > limx or y > limy:
     raise ValueError('Position outside matrix')
