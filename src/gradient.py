@@ -30,7 +30,7 @@ def L_numericalGradient(m, x, y):
   f2[x,y] -= d
   f2[y,x] -= d
   # l1, l2 = getLaplacianMatrix(f1), getLaplacianMatrix(f2)
-  l1, l2 = scipy.sparse.csgraph.laplacian(f1), scipy.sparse.csgraph.laplacian(f2)
+  l1, l2 = scipy.sparse.csgraph.laplacian(f1, normed=True), scipy.sparse.csgraph.laplacian(f2, normed=True)
   # L1, d1= scipy.sparse.csgraph.laplacian(f1, normed=True, return_diag=True)
   # L2, d2= scipy.sparse.csgraph.laplacian(f2, normed=True, return_diag=True)
   return (l1-l2)/(2*d)
@@ -82,29 +82,35 @@ def dw_ij(i, j, sij, feature):
 def allDLoss(sigma, L, L_true, features):
   # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
   accu = np.zeros(L.shape)
+  dict_dw_ij, dict_dL = {}, {}
   for i in xrange(len(L)):
     for j in xrange(len(L)):
-      print(i,j)
-      accu += L_analyticalGradient(L,i,j) * dw_ij(i,j,sigma[i,j],features)
-  return accu
+      if (i,j) in dict_dw_ij:
+        dL = dict_dL[(i,j)]
+        dw = dict_dw_ij[(i,j)]
+      else:
+        dL = L_analyticalGradient(L,i,j)
+        dw = dw_ij(i,j,sigma[i,j],features)
+        dict_dL[(i,j)], dict_dL[(j,i)] = dL, dL
+        dict_dw_ij[(i,j)], dict_dw_ij[(j,i)] = dw, dw
 
-# m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
+      accu += dL * dw
+  return -1 * (L_true - L) * accu
+
+m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
 
 # s = 2
-# print (w_ij(0,1,s+1e-6,m) - w_ij(0,1,s-1e-6,m))/(2*1e-6)
-# print dw_ij(0,1,s,m)
-
-
-
-# # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
-# # # m = np.ones((5,5))
-# # # print m
-# # # print getLaplacianMatrix(m)
-
-# # # L, d= scipy.sparse.csgraph.laplacian(m, normed=True, return_diag=True)
-# # # print L
 # for i in xrange(len(m)):
 #   for j in xrange(len(m)):
-#     dL_num = numericalGradient(m, i,j)
-#     dL_ana = analyticalGradient(m, i,j)
+#     print dw_ij(i,j,s,m)-(w_ij(i,j,s+1e-6,m) - w_ij(i,j,s-1e-6,m))/(2*1e-6)<1e-10
+
+
+# for i in xrange(len(m)):
+#   for j in xrange(len(m)):
+#     dL_num = L_numericalGradient(m, i,j)
+#     dL_ana = L_analyticalGradient(m, i,j)
+#     # print dL_num
+#     # print dL_ana
+#     # print '-----------------'
 #     print "all diff are below 1e-10: ", np.all((dL_num-dL_ana)<1e-10)
+#     print (dL_ana == dL_ana.T).all()
