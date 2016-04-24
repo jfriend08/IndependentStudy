@@ -29,8 +29,8 @@ def L_numericalGradient(m, x, y):
   f1[y,x] += d
   f2[x,y] -= d
   f2[y,x] -= d
-  l1, l2 = getLaplacianMatrix(f1), getLaplacianMatrix(f2)
-  # l1, l2 = scipy.sparse.csgraph.laplacian(f1), scipy.sparse.csgraph.laplacian(f2)
+  # l1, l2 = getLaplacianMatrix(f1), getLaplacianMatrix(f2)
+  l1, l2 = scipy.sparse.csgraph.laplacian(f1), scipy.sparse.csgraph.laplacian(f2)
   # L1, d1= scipy.sparse.csgraph.laplacian(f1, normed=True, return_diag=True)
   # L2, d2= scipy.sparse.csgraph.laplacian(f2, normed=True, return_diag=True)
   return (l1-l2)/(2*d)
@@ -78,6 +78,15 @@ def dw_ij(i, j, sij, feature):
   orig = w_ij(i, j, sij, feature)
   diff = np.linalg.norm(feature[i]-feature[j])
   return (2*orig*diff**2)/(sij**3)
+
+def allDLoss(sigma, L, L_true, features):
+  # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
+  accu = np.zeros(L.shape)
+  for i in xrange(len(L)):
+    for j in xrange(len(L)):
+      print(i,j)
+      accu += L_analyticalGradient(L,i,j) * dw_ij(i,j,sigma[i,j],features)
+  return accu
 
 # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
 
