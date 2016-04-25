@@ -1,0 +1,7 @@
+(441000,) (862, 84)
+(862, 862)
+is symmetric:  True
+[[array([ 0, 42]), 'up'], [array([42, 43]), 'transitDown'], [array([43, 86]), 'down'], [array([86, 86]), 'transitUp'], [array([ 86, 129]), 'up'], [array([129, 129]), 'transitDown'], [array([129, 172]), 'down'], [array([172, 172]), 'transitUp'], [array([172, 215]), 'up'], [array([215, 215]), 'transitDown'], [array([215, 258]), 'down'], [array([258, 258]), 'transitUp'], [array([258, 301]), 'up'], [array([301, 301]), 'transitDown'], [array([301, 344]), 'down'], [array([344, 344]), 'transitUp'], [array([344, 387]), 'up'], [array([387, 387]), 'transitDown'], [array([387, 430]), 'down'], [array([430, 430]), 'transitUp'], [array([430, 473]), 'up'], [array([473, 473]), 'transitDown'], [array([473, 516]), 'down'], [array([516, 516]), 'transitUp'], [array([516, 559]), 'up'], [array([559, 559]), 'transitDown'], [array([559, 602]), 'down'], [array([602, 603]), 'transitUp'], [array([603, 645]), 'up'], [array([645, 646]), 'transitDown'], [array([646, 688]), 'down'], [array([688, 689]), 'transitUp'], [array([689, 732]), 'up'], [array([732, 732]), 'transitDown'], [array([732, 775]), 'down'], [array([775, 775]), 'transitUp'], [array([775, 818]), 'up'], [array([818, 818]), 'transitDown'], [array([818, 861]), 'down']]
+m_true is symmetruc:  True
+hi
+saving sigmas to:  ./sigmas/sigmas_0.npy
