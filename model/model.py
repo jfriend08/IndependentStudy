@@ -66,62 +66,45 @@ print "L diag all 1: ", all([L[i,i] == 1 for i in xrange(L.shape[0])])
 print "L_true diag all 1: ", all([L_true[i,i] == 1 for i in xrange(L_true.shape[0])])
 
 err = 0.5 * np.linalg.norm(L_true-L)**2
-epco, alpha, res = 5, 0.1, []
+epco, alpha, res = 5, 10, []
 print "hi"
 res += [err]
 
-filename = "./fig/L_orignalAll.png"
+filename = "./fig/L_orignalAll_alpha10.png"
 plt.figure(figsize=(15, 5))
-plt.subplot(2, 2, 1)
-plt.pcolor(L_true, cmap="viridis")
-plt.colorbar()
-plt.title('L_true')
 
-plt.subplot(2, 2, 2)
-plt.pcolor(L, cmap="viridis")
-plt.colorbar()
-plt.title('L')
-
-plt.subplot(2, 2, 3)
+plt.subplot(1, 2, 1)
 plt.pcolor(m_true, cmap="viridis")
 plt.colorbar()
 plt.title('m_true')
 
-plt.subplot(2, 2, 4)
+plt.subplot(1, 2, 2)
 plt.pcolor(gm, cmap="viridis")
 plt.colorbar()
 plt.title('m')
 plt.savefig(filename)
 
 for i in xrange(epco):
-  accu = gradient.allDLoss(sigmas, L, L_true, cqt)
+  accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt)
   sigmas = sigmas - alpha * accu
-
-  filename = "./sigmas/sigmas_" + str(i) + ".npy"
+  print "sigmas"
+  print sigmas
+  filename = "./sigmas/sigmas_alpha10_" + str(i) + ".npy"
   print "saving sigmas to: ", filename
   np.save(filename, sigmas)
 
   gm = RM.feature2GaussianMatrix(cqt, sigmas)
   L = scipy.sparse.csgraph.laplacian(gm, normed=True)
 
-  filename = "./fig/allL_" + str(i) + ".png"
+  filename = "./fig/allL_alpha10_" + str(i) + ".png"
   plt.figure(figsize=(15, 5))
-  plt.subplot(2, 2, 1)
-  plt.pcolor(L_true, cmap="viridis")
-  plt.colorbar()
-  plt.title('L_true')
 
-  plt.subplot(2, 2, 2)
-  plt.pcolor(L, cmap="viridis")
-  plt.colorbar()
-  plt.title('L')
-
-  plt.subplot(2, 2, 3)
+  plt.subplot(1, 2, 1)
   plt.pcolor(m_true, cmap="viridis")
   plt.colorbar()
   plt.title('m_true')
 
-  plt.subplot(2, 2, 4)
+  plt.subplot(1, 2, 2)
   plt.pcolor(gm, cmap="viridis")
   plt.colorbar()
   plt.title('m')
