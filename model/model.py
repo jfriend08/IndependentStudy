@@ -9,9 +9,14 @@ import librosa
 sys.path.append('../src')
 import laplacian
 import RecurrenceMatrix as RM
-import gradient
+import gradient, plotGraph
 
 mu, sigma, length = 10, 1, 22050/2 # mean, standard deviation, and sampling rate
+epco, alpha, res = 5, 2, []
+
+sigmaPath = "./sigmas/"
+figurePath = "./fig/"
+namePrefix = "modelRun_Alpha" + str(alpha)
 
 signal = []
 for i in xrange(20):
@@ -66,49 +71,26 @@ print "L diag all 1: ", all([L[i,i] == 1 for i in xrange(L.shape[0])])
 print "L_true diag all 1: ", all([L_true[i,i] == 1 for i in xrange(L_true.shape[0])])
 
 err = 0.5 * np.linalg.norm(L_true-L)**2
-epco, alpha, res = 5, 10, []
-print "hi"
+
 res += [err]
 
-filename = "./fig/L_orignalAll_alpha10.png"
-plt.figure(figsize=(15, 5))
-
-plt.subplot(1, 2, 1)
-plt.pcolor(m_true, cmap="viridis")
-plt.colorbar()
-plt.title('m_true')
-
-plt.subplot(1, 2, 2)
-plt.pcolor(gm, cmap="viridis")
-plt.colorbar()
-plt.title('m')
-plt.savefig(filename)
+filename = figurePath + namePrefix + "_original.png"
+plotGraph.plot2(filename, m_true, "m_true", gm, "gm")
 
 for i in xrange(epco):
   accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt)
   sigmas = sigmas - alpha * accu
-  print "sigmas"
-  print sigmas
-  filename = "./sigmas/sigmas_alpha10_" + str(i) + ".npy"
+  sigmas = np.around(sigmas, decimals = 10)
+
+  filename = sigmaPath + namePrefix + "_step" + str(i) + ".npy"
   print "saving sigmas to: ", filename
   np.save(filename, sigmas)
 
   gm = RM.feature2GaussianMatrix(cqt, sigmas)
   L = scipy.sparse.csgraph.laplacian(gm, normed=True)
 
-  filename = "./fig/allL_alpha10_" + str(i) + ".png"
-  plt.figure(figsize=(15, 5))
-
-  plt.subplot(1, 2, 1)
-  plt.pcolor(m_true, cmap="viridis")
-  plt.colorbar()
-  plt.title('m_true')
-
-  plt.subplot(1, 2, 2)
-  plt.pcolor(gm, cmap="viridis")
-  plt.colorbar()
-  plt.title('m')
-  plt.savefig(filename)
+  filename = figurePath + namePrefix + "_epch" + str(i) + ".png"
+  plotGraph.plot2(filename, m_true, "m_true", gm, "gm")
 
   err = 0.5 * np.linalg.norm(L_true-L)**2
   res += [err]
