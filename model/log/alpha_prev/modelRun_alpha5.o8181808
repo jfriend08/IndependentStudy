@@ -1,0 +1,13 @@
+(220500,) (431, 84)
+(431, 431)
+is symmetric:  True
+[[array([ 0, 21]), 'up'], [array([21, 21]), 'transitDown'], [array([21, 42]), 'down'], [array([42, 43]), 'transitUp'], [array([43, 64]), 'up'], [array([64, 64]), 'transitDown'], [array([64, 86]), 'down'], [array([86, 86]), 'transitUp'], [array([ 86, 107]), 'up'], [array([107, 107]), 'transitDown'], [array([107, 129]), 'down'], [array([129, 129]), 'transitUp'], [array([129, 150]), 'up'], [array([150, 150]), 'transitDown'], [array([150, 172]), 'down'], [array([172, 172]), 'transitUp'], [array([172, 193]), 'up'], [array([193, 193]), 'transitDown'], [array([193, 215]), 'down'], [array([215, 215]), 'transitUp'], [array([215, 236]), 'up'], [array([236, 236]), 'transitDown'], [array([236, 258]), 'down'], [array([258, 258]), 'transitUp'], [array([258, 279]), 'up'], [array([279, 280]), 'transitDown'], [array([280, 301]), 'down'], [array([301, 301]), 'transitUp'], [array([301, 322]), 'up'], [array([322, 323]), 'transitDown'], [array([323, 344]), 'down'], [array([344, 344]), 'transitUp'], [array([344, 365]), 'up'], [array([365, 366]), 'transitDown'], [array([366, 387]), 'down'], [array([387, 387]), 'transitUp'], [array([387, 409]), 'up'], [array([409, 409]), 'transitDown'], [array([409, 430]), 'down']]
+m_true is symmetruc:  True
+L diag all 1:  True
+L_true diag all 1:  True
+saving sigmas to:  ./sigmas/modelRun_Alpha5_step0.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha5_step1.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha5_step2.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha5_step3.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha5_step4.npy
+[0.53672937874894477, 0.53568170573876894, 0.53470348958323266, 0.5337980995071655, 0.53295770549269295, 0.53217223794636914]

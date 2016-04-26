@@ -37,6 +37,7 @@ def L_numericalGradient(m, x, y):
 
 def L_analyticalGradient(m, x, y):
   limx, limy = m.shape
+
   if x > limx or y > limy:
     raise ValueError('Position outside matrix')
   # if x == y:
@@ -77,32 +78,32 @@ def w_ij(i, j, sij, feature):
 def dw_ij(i, j, sij, feature):
   orig = w_ij(i, j, sij, feature)
   diff = np.linalg.norm(feature[i]-feature[j])
-  return (2*orig*diff**2)/(sij**3)
+  return (2*orig*diff)/(sij**3)
 
-def allDLoss(sigma, L, L_true, features):
+def allDLoss(sigma, L, L_true, RMatrix, features):
   # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
   accu = np.zeros(L.shape)
-  dict_dw_ij, dict_dL = {}, {}
   for i in xrange(len(L)):
-    for j in xrange(len(L)):
-      if (i,j) in dict_dw_ij:
-        dL = dict_dL[(i,j)]
-        dw = dict_dw_ij[(i,j)]
-      else:
-        dL = L_analyticalGradient(L,i,j)
-        dw = dw_ij(i,j,sigma[i,j],features)
-        dict_dL[(i,j)], dict_dL[(j,i)] = dL, dL
-        dict_dw_ij[(i,j)], dict_dw_ij[(j,i)] = dw, dw
-
-      accu += dL * dw
+    for j in xrange(i+1, len(L)): #no i==j, due to dw is all zero
+      dL = L_analyticalGradient(RMatrix,i,j)
+      dw = dw_ij(i,j,sigma[i,j],features)
+      accu += 2 * (dL * dw) #due to its symmetric properity
   return -1 * (L_true - L) * accu
 
-m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
+# def allDLossII(sigma, L, L_true, RMatrix, features):
+#   # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
+#   accu = np.zeros(L.shape)
+#   [2*L_analyticalGradient(RMatrix,i,j)*dw_ij(i,j,sigma[i,j],features) for j in xrange(i+1,len(L)) for i in xrange(len(L))]
+#   np.fromfunction(getVal, sigma.shape)
+#   return accu
 
-# s = 2
-# for i in xrange(len(m)):
-#   for j in xrange(len(m)):
-#     print dw_ij(i,j,s,m)-(w_ij(i,j,s+1e-6,m) - w_ij(i,j,s-1e-6,m))/(2*1e-6)<1e-10
+# m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
+
+# m = np.random.rand(100, 100)*100
+# m = (m + m.T)/2
+# print "is symmetric: ", (m == m.T).all()
+# s = 0.001
+# print all([dw_ij(i,j,s,m)-(w_ij(i,j,s+1e-10,m) - w_ij(i,j,s-1e-6,m))/(2*1e-6)<1e-10 for j in xrange(len(m)) for i in xrange(len(m))])
 
 
 # for i in xrange(len(m)):

@@ -1,0 +1,38 @@
+(220500,) (431, 84)
+(431, 431)
+is symmetric:  True
+[[array([ 0, 21]), 'up'], [array([21, 21]), 'transitDown'], [array([21, 42]), 'down'], [array([42, 43]), 'transitUp'], [array([43, 64]), 'up'], [array([64, 64]), 'transitDown'], [array([64, 86]), 'down'], [array([86, 86]), 'transitUp'], [array([ 86, 107]), 'up'], [array([107, 107]), 'transitDown'], [array([107, 129]), 'down'], [array([129, 129]), 'transitUp'], [array([129, 150]), 'up'], [array([150, 150]), 'transitDown'], [array([150, 172]), 'down'], [array([172, 172]), 'transitUp'], [array([172, 193]), 'up'], [array([193, 193]), 'transitDown'], [array([193, 215]), 'down'], [array([215, 215]), 'transitUp'], [array([215, 236]), 'up'], [array([236, 236]), 'transitDown'], [array([236, 258]), 'down'], [array([258, 258]), 'transitUp'], [array([258, 279]), 'up'], [array([279, 280]), 'transitDown'], [array([280, 301]), 'down'], [array([301, 301]), 'transitUp'], [array([301, 322]), 'up'], [array([322, 323]), 'transitDown'], [array([323, 344]), 'down'], [array([344, 344]), 'transitUp'], [array([344, 365]), 'up'], [array([365, 366]), 'transitDown'], [array([366, 387]), 'down'], [array([387, 387]), 'transitUp'], [array([387, 409]), 'up'], [array([409, 409]), 'transitDown'], [array([409, 430]), 'down']]
+m_true is symmetruc:  True
+L diag all 1:  True
+L_true diag all 1:  True
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step0.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step1.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step2.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step3.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step4.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step5.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step6.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step7.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step8.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step9.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step10.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step11.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step12.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step13.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step14.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step15.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step16.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step17.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step18.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step19.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step20.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step21.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step22.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step23.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step24.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step25.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step26.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step27.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step28.npy
+saving sigmas to:  ./sigmas/modelRun_Alpha10_step29.npy
+[0.53726768915075551, 0.53516547779719625, 0.53341240361616205, 0.53189886940966635, 0.53052368511497228, 0.52925717325159305, 0.52808963779958673, 0.52700635323634015, 0.52598616448076541, 0.5250138070843986, 0.52408093093252284, 0.52318612405193876, 0.52232926166577387, 0.5215050777753063, 0.52070751710835728, 0.51993502590931218, 0.51918867172138039, 0.51846481091658936, 0.51775879522075818, 0.51707213310445754, 0.51640731061017253, 0.51575790127479837, 0.51512553095228208, 0.51451221385412216, 0.51391493653592113, 0.51333190936401374, 0.51275993158397071, 0.51219685096957901, 0.51164967575795162, 0.51112019128868713, 0.51060478862978198]

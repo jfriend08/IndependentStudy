@@ -12,7 +12,8 @@ import RecurrenceMatrix as RM
 import gradient, plotGraph
 
 mu, sigma, length = 10, 1, 22050/2 # mean, standard deviation, and sampling rate
-epco, alpha, res = 5, 2, []
+epco, alpha, res = 30, 2000, []
+np.random.seed(123)
 
 sigmaPath = "./sigmas/"
 figurePath = "./fig/"
@@ -36,6 +37,7 @@ plt.savefig('./fig/signal.png')
 ############################################################
 cqt = np.transpose(librosa.cqt(signal))
 print signal.shape, cqt.shape
+
 
 sigmas = np.random.rand(cqt.shape[0], cqt.shape[0])
 sigmas = (sigmas + sigmas.T)/2
