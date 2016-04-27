@@ -21,10 +21,17 @@ import gradient, plotGraph
 
 
 
-container, prefix = [], './sigmas/modelRun_Alpha2000'
-for i in xrange(7):
+container, prefix = [], './sigmas/prev2/modelRun_Alpha2000'
+for i in xrange(17):
   name = prefix + "_step" + str(i) + ".npy"
   container += [np.load(name)]
+
+def getContainer(name, num):
+  container, prefix = [], './sigmas/prev2/modelRun_'+ name
+  for i in xrange(num):
+    name = prefix + "_step" + str(i) + ".npy"
+    container += [np.load(name)]
+  return container
 
 # sigmas0 = np.load('./sigmas/modelRun_Alpha10_step0.npy')
 # sigmas1 = np.load('./sigmas/modelRun_Alpha10_step1.npy')
@@ -65,19 +72,29 @@ def t2f(x):
     return librosa.core.time_to_frames(x, sr=22050, hop_length=512, n_fft=None)
 allInterval = [[np.apply_along_axis(t2f, 0, elm[0]/22050), elm[1]] for elm in allInterval]
 m_true = RM.label2RecurrenceMatrix("../data/2.jams", gm0.shape[0], allInterval)
-
-
 L_true = scipy.sparse.csgraph.laplacian(m_true, normed=True)
-for i, sigma in enumerate(container):
-  gm = RM.feature2GaussianMatrix(cqt, sigma)
-  L = scipy.sparse.csgraph.laplacian(gm, normed=True)
 
-  # filename = './Laplacian' + "_step" + str(i) + ".png"
-  # plotGraph.plot2(filename, L_true, "L_true", L, "L")
+style = ['-.','--', '+', '.', ':']
+plt.figure(figsize=(12, 12))
+legend = []
+# name, range
+mylist = [['Alpha10', 30], ['Alpha20', 17], ['Alpha80', 17], ['Alpha100', 17], ['Alpha400', 17], ['Alpha600', 17], ['Alpha700', 17], ['Alpha2000', 17]]
 
-  err = 0.5 * np.linalg.norm(L_true-L)**2
+for idx, (name, num) in enumerate(mylist):
+  container, errors = getContainer(name, num), []
+  for i, sigma in enumerate(container):
+    gm = RM.feature2GaussianMatrix(cqt, sigma)
+    L = scipy.sparse.csgraph.laplacian(gm, normed=True)
+    err = 0.5 * np.linalg.norm(L_true-L)**2
+    errors += [err]
+    print name + " err"+str(i), str(err)
+  plt.plot(range(len(errors)), errors, style[idx%len(style)])
+  legend += [name]
 
-  print "err"+str(i), str(err)
-
+plt.legend(legend, loc=1)
+plt.title('Laplacian Error per Steps')
+plt.xlabel("Steps")
+plt.ylabel("Laplacian Error(L_true - L)")
+plt.savefig('./test.png')
 
 
