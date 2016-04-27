@@ -10,7 +10,12 @@ sys.path.append('../src')
 import laplacian, gradient, plotGraph, librosaF
 import RecurrenceMatrix as RM
 
-import os
+epco, alpha, res = 30, 2000, []
+np.random.seed(123)
+
+sigmaPath = "./sigmas/"
+figurePath = "./fig/"
+namePrefix = "modelReal_Alpha" + str(alpha)
 
 def mp32np(fname):
   oname = 'temp.wav'
@@ -52,9 +57,10 @@ def loadInterval2Frame(path, sr=22050, frameConversion=None):
   interval = [[np.apply_along_axis(t2f, 0, elm[0]), elm[1]] for elm in interval]
 
   if frameConversion != None:
-    print interval
     interval = [[np.apply_along_axis(f2f, 0, elm[0]), elm[1]] for elm in interval]
-
+    print interval
+    interval = [elm for elm in interval if elm[0].size!=0]
+    print interval
   return interval
 
 
@@ -68,33 +74,73 @@ cqt = librosa.cqt(y=y, sr=sr)
 print "Perform sync"
 cqt_med, frameConversion = librosaF.sync(cqt, beats, aggregate=np.median)
 
-# print "Perform loadInterval2Frame"
-# interval = loadInterval2Frame("../data/anno/698/parsed/textfile1_uppercase.txt", sr, frameConversion)
-# print interval
-# # print "frameConversion:"
-# # print frameConversion
+print "Perform loadInterval2Frame"
+interval = loadInterval2Frame("../data/anno/698/parsed/textfile1_uppercase.txt", sr, frameConversion)
+
+sigmas = np.random.rand(cqt_med.shape[1], cqt_med.shape[1])
+sigmas = (sigmas + sigmas.T)/2
+gm = RM.feature2GaussianMatrix(cqt_med.T, sigmas) #(nSample, nFeature)
+L = scipy.sparse.csgraph.laplacian(gm, normed=True)
+
+print "gm.shape: ", gm.shape
+
+m_true = RM.label2RecurrenceMatrix("../data/2.jams", gm.shape[0], interval)
+L_true = scipy.sparse.csgraph.laplacian(m_true, normed=True)
+
+print "gm.shape, m_true.shape: ", gm.shape, m_true.shape
+print "gm is symmetric: ", (gm==np.transpose(gm)).all()
+print "m_true is symmetric: ", (m_true==np.transpose(m_true)).all()
+
+plotGraph.plot2('./realMusicRMatrix', m_true, "m_true", gm, "gm")
+plotGraph.plot2('./realMusicLaplacian', L_true, "L_true", L, "L")
+
+for i in xrange(epco):
+  accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt_med.T)
+  sigmas = sigmas - alpha * accu
+  sigmas = np.around(sigmas, decimals = 10)
+
+  filename = sigmaPath + namePrefix + "_step" + str(i) + ".npy"
+  print "saving sigmas to: ", filename
+  np.save(filename, sigmas)
+
+  gm = RM.feature2GaussianMatrix(cqt_med.T, sigmas)
+  L = scipy.sparse.csgraph.laplacian(gm, normed=True)
+
+  filename = figurePath + namePrefix + "_epch" + str(i) + ".png"
+  plotGraph.plot2(filename, m_true, "m_true", gm, "gm")
+
+  err = 0.5 * np.linalg.norm(L_true-L)**2
+  res += [err]
+
+print res
 
 
-print "Perform subsegment"
-sub_beats = librosa.segment.subsegment(cqt, beats)
-cqt_med_sub = librosa.util.sync(cqt, sub_beats, aggregate=np.median)
 
 
-plt.figure()
-plt.subplot(3, 1, 1)
-librosa.display.specshow(librosa.logamplitude(cqt**2,ref_power=np.max),x_axis='time',sr=sr)
-plt.colorbar(format='%+2.0f dB')
-plt.title('CQT power, shape={}'.format(cqt.shape))
 
-plt.subplot(3, 1, 2)
-librosa.display.specshow(librosa.logamplitude(cqt_med**2,ref_power=np.max))
-plt.colorbar(format='%+2.0f dB')
-plt.title('Beat synchronous CQT power, ,shape={}'.format(cqt_med.shape))
 
-plt.subplot(3, 1, 3)
-librosa.display.specshow(librosa.logamplitude(cqt_med_sub**2,ref_power=np.max))
 
-plt.colorbar(format='%+2.0f dB')
-plt.title('Sub-beat synchronous CQT power, shape={}'.format(cqt_med_sub.shape))
-plt.tight_layout()
-plt.savefig('./test.png')
+
+# print "Perform subsegment"
+# sub_beats = librosa.segment.subsegment(cqt, beats)
+# cqt_med_sub = librosa.util.sync(cqt, sub_beats, aggregate=np.median)
+
+
+# plt.figure()
+# plt.subplot(3, 1, 1)
+# librosa.display.specshow(librosa.logamplitude(cqt**2,ref_power=np.max),x_axis='time',sr=sr)
+# plt.colorbar(format='%+2.0f dB')
+# plt.title('CQT power, shape={}'.format(cqt.shape))
+
+# plt.subplot(3, 1, 2)
+# librosa.display.specshow(librosa.logamplitude(cqt_med**2,ref_power=np.max))
+# plt.colorbar(format='%+2.0f dB')
+# plt.title('Beat synchronous CQT power, ,shape={}'.format(cqt_med.shape))
+
+# plt.subplot(3, 1, 3)
+# librosa.display.specshow(librosa.logamplitude(cqt_med_sub**2,ref_power=np.max))
+
+# plt.colorbar(format='%+2.0f dB')
+# plt.title('Sub-beat synchronous CQT power, shape={}'.format(cqt_med_sub.shape))
+# plt.tight_layout()
+# plt.savefig('./test.png')
