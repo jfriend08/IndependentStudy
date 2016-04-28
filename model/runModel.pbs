@@ -2,7 +2,7 @@
 
 #PBS -V
 #PBS -S /bin/bash
-#PBS -N modelRun_alpha2000
+#PBS -N realMusic_alpha2000
 #PBS -l nodes=1:ppn=1
 #PBS -l walltime=24:00:00
 #PBS -M yss265@nuy.edu
@@ -14,4 +14,5 @@
 
 cd /scratch/yss265/IndependentStudy/model
 module load librosa
-python model.py
+# python model.py
+python modelOnMusic.py

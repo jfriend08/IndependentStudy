@@ -10,7 +10,7 @@ sys.path.append('../src')
 import laplacian, gradient, plotGraph, librosaF
 import RecurrenceMatrix as RM
 
-epco, alpha, res = 30, 2000, []
+epco, alpha, res, sigmaMul = 30, 2000, [], 10
 np.random.seed(123)
 
 sigmaPath = "./sigmas/"
@@ -73,13 +73,14 @@ cqt = librosa.cqt(y=y, sr=sr)
 
 print "Perform sync"
 cqt_med, frameConversion = librosaF.sync(cqt, beats, aggregate=np.median)
+cqt_med = cqt_med.T
 
 print "Perform loadInterval2Frame"
 interval = loadInterval2Frame("../data/anno/698/parsed/textfile1_uppercase.txt", sr, frameConversion)
 
-sigmas = np.random.rand(cqt_med.shape[1], cqt_med.shape[1])
-sigmas = (sigmas + sigmas.T)/2
-gm = RM.feature2GaussianMatrix(cqt_med.T, sigmas) #(nSample, nFeature)
+sigmas = np.random.rand(cqt_med.shape[0], cqt_med.shape[0])
+sigmas = ((sigmas + sigmas.T)/2)*sigmaMul
+gm = RM.feature2GaussianMatrix(cqt_med, sigmas) #(nSample, nFeature)
 L = scipy.sparse.csgraph.laplacian(gm, normed=True)
 
 print "gm.shape: ", gm.shape
@@ -91,11 +92,11 @@ print "gm.shape, m_true.shape: ", gm.shape, m_true.shape
 print "gm is symmetric: ", (gm==np.transpose(gm)).all()
 print "m_true is symmetric: ", (m_true==np.transpose(m_true)).all()
 
-plotGraph.plot2('./realMusicRMatrix', m_true, "m_true", gm, "gm")
-plotGraph.plot2('./realMusicLaplacian', L_true, "L_true", L, "L")
+plotGraph.plot2('./realMusicRMatrix2', m_true, "m_true", gm, "gm")
+plotGraph.plot2('./realMusicLaplacian2', L_true, "L_true", L, "L")
 
 for i in xrange(epco):
-  accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt_med.T)
+  accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt_med)
   sigmas = sigmas - alpha * accu
   sigmas = np.around(sigmas, decimals = 10)
 
@@ -103,7 +104,7 @@ for i in xrange(epco):
   print "saving sigmas to: ", filename
   np.save(filename, sigmas)
 
-  gm = RM.feature2GaussianMatrix(cqt_med.T, sigmas)
+  gm = RM.feature2GaussianMatrix(cqt_med, sigmas)
   L = scipy.sparse.csgraph.laplacian(gm, normed=True)
 
   filename = figurePath + namePrefix + "_epch" + str(i) + ".png"

@@ -1,0 +1,10 @@
+Perform beat_track and cqt
+Perform sync
+Perform loadInterval2Frame
+[[array([], dtype=float64), 'Silence'], [array([ 0, 18]), 'I'], [array([18, 50]), 'V'], [array([50, 81]), 'V'], [array([ 81, 113]), 'C'], [array([113, 130]), 'T'], [array([130, 161]), 'V'], [array([161, 193]), 'C'], [array([193, 242]), "T'"], [array([242, 274]), 'C'], [array([274, 321]), 'O'], [array([], dtype=float64), 'Silence']]
+[[array([ 0, 18]), 'I'], [array([18, 50]), 'V'], [array([50, 81]), 'V'], [array([ 81, 113]), 'C'], [array([113, 130]), 'T'], [array([130, 161]), 'V'], [array([161, 193]), 'C'], [array([193, 242]), "T'"], [array([242, 274]), 'C'], [array([274, 321]), 'O']]
+gm.shape:  (322, 322)
+gm.shape, m_true.shape:  (322, 322) (322, 322)
+gm is symmetric:  True
+m_true is symmetric:  True
+saving sigmas to:  ./sigmas/modelReal_Alpha2000_step0.npy
