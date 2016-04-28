@@ -15,7 +15,7 @@ np.random.seed(123)
 
 sigmaPath = "./sigmas/"
 figurePath = "./fig/"
-namePrefix = "modelReal_newUpdate_Alpha" + str(alpha)
+namePrefix = "modelReal_batchUpdate_Alpha" + str(alpha)
 
 def mp32np(fname):
   oname = 'temp.wav'
@@ -115,6 +115,8 @@ print "m_true is symmetric: ", (m_true==np.transpose(m_true)).all()
 # filename = figurePath + namePrefix + "_orig.png"
 # plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
 
+err = 0.5 * np.linalg.norm(L_true-L)**2
+print "errors: ", str(err)
 
 for ep in xrange(epco):
   def updateEachOne(gm, L, L_true, cqt_med, sigmas):
@@ -143,14 +145,20 @@ for ep in xrange(epco):
             filename = figurePath + namePrefix + "_update" + str((i,j))
             plotGraph.plot2(filename+"R", m_true, "m_true", gm, "gm")
             plotGraph.plot2(filename+"L", L_true, "L_true", L, "L")
+    return sigmas
 
-  def batchUpdate():
+  def batchUpdate(gm, L, L_true, cqt_med, sigmas):
     accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt_med)
     sigmas = sigmas - alpha * accu
     sigmas = (sigmas + sigmas.T)/2
 
-  updateEachOne(gm, L, L_true, cqt_med, sigmas)
+    filename = figurePath + namePrefix + "_BatchUpdate"
+    plotGraph.plot1(filename+"Sigma", sigmas, "sigmas")
 
+    return sigmas
+
+  # sigmas = updateEachOne(gm, L, L_true, cqt_med, sigmas)
+  sigmas = batchUpdate(gm, L, L_true, cqt_med, sigmas)
 
   print "sigmas:"
   print sigmas
@@ -164,12 +172,13 @@ for ep in xrange(epco):
   print "gm"
   print gm
 
-  filename = figurePath + namePrefix + "_epch" + str(i)
+  filename = figurePath + namePrefix + "_epch" + str(ep)
   plotGraph.plot2(filename+"R", m_true, "m_true", gm, "gm")
   plotGraph.plot2(filename+"L", L_true, "L_true", L, "L")
   # plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
 
   err = 0.5 * np.linalg.norm(L_true-L)**2
+  print "epoch: ", str(ep), " errors: ", str(err)
   res += [err]
 
 print res
