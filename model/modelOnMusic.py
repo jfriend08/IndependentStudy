@@ -167,12 +167,7 @@ for ep in xrange(epco):
   print "saving sigmas to: ", filename
   np.save(filename, sigmas)
 
-  newgm = RM.feature2GaussianMatrix(cqt_med, sigmas)
-
-  filename = sigmaPath + namePrefix + "_step" + str(ep) + ".npy"
-  print "saving sigmas to: ", filename
-  np.save(filename, sigmas)
-
+  gm = RM.feature2GaussianMatrix(cqt_med, sigmas)
   L = scipy.sparse.csgraph.laplacian(gm, normed=True)
   print "gm"
   print gm
