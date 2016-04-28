@@ -10,12 +10,12 @@ sys.path.append('../src')
 import laplacian, gradient, plotGraph, librosaF
 import RecurrenceMatrix as RM
 
-epco, alpha, res, sigmaMul = 10, 2000, [], 1000
+epco, alpha, res, sigmaMul = 10, 3000, [], 1000
 np.random.seed(123)
 
 sigmaPath = "./sigmas/"
 figurePath = "./fig/"
-namePrefix = "modelReal_Alpha" + str(alpha)
+namePrefix = "modelReal_newUpdate_Alpha" + str(alpha)
 
 def mp32np(fname):
   oname = 'temp.wav'
@@ -65,20 +65,25 @@ def loadInterval2Frame(path, sr=22050, frameConversion=None):
 
 
 
-sr, signal = mp32np('../data/audio/SALAMI_698.mp3')
-y = signal[:,0]
-print "Perform beat_track and cqt"
-tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
-cqt = librosa.cqt(y=y, sr=sr)
+# sr, signal = mp32np('../data/audio/SALAMI_698.mp3')
+# y = signal[:,0]
+# print "Perform beat_track and cqt"
+# tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+# cqt = librosa.cqt(y=y, sr=sr)
+# print "saving cqt and beats... "
+# np.save("cqt.npy", cqt)
+# np.save("beats.npy", beats)
+
+print "Loading cqt and beats... "
+cqt = np.load('./cqt.npy')
+beats = np.load('./beats.npy')
+sr = 44100
 
 print "Perform sync"
 cqt_med, frameConversion = librosaF.sync(cqt, beats, aggregate=np.median)
 cqt_med = cqt_med.T
-print "saving cqt_med... "
-np.save("cqt_med.npy", cqt_med)
 
-# print "Loading cqt_med... "
-# cqt_med = np.load('./cqt_med.npy')
+
 
 print "Perform loadInterval2Frame"
 interval = loadInterval2Frame("../data/anno/698/parsed/textfile1_uppercase.txt", sr, frameConversion)
@@ -97,21 +102,60 @@ print gm
 m_true = RM.label2RecurrenceMatrix("../data/2.jams", gm.shape[0], interval)
 L_true = scipy.sparse.csgraph.laplacian(m_true, normed=True)
 
+print "L_true"
+print L_true
+
 print "gm.shape, m_true.shape: ", gm.shape, m_true.shape
 print "gm is symmetric: ", (gm==np.transpose(gm)).all()
 print "m_true is symmetric: ", (m_true==np.transpose(m_true)).all()
 
-plotGraph.plot2('./realMusicRMatrix2', m_true, "m_true", gm, "gm")
-plotGraph.plot2('./realMusicLaplacian2', L_true, "L_true", L, "L")
+# plotGraph.plot2(namePrefix+"_R", m_true, "m_true", gm, "gm")
+# plotGraph.plot2(namePrefix+"_L", L_true, "L_true", L, "L")
 
-for i in xrange(epco):
-  accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt_med)
-  sigmas = sigmas - alpha * accu
-  sigmas = np.around(sigmas, decimals = 10)
+# filename = figurePath + namePrefix + "_orig.png"
+# plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
+
+
+for ep in xrange(epco):
+  def updateEachOne(gm, L, L_true, cqt_med, sigmas):
+    updateC = 0
+    # update each sigma and transfer to GM immediatly
+    for i in xrange(gm.shape[0]):
+      for j in xrange(i+1, gm.shape[0]):
+        if abs(L_true[i,j] - L[i,j]) > 1e-3: #only update the sigma where L is large
+          updateC += 1
+          dL = gradient.L_analyticalGradient(gm,i,j)
+          dw = gradient.dw_ij(i,j,sigmas[i,j],cqt_med)
+          sigmas = sigmas - alpha * ( -1 * 2 * (L_true - L) * dL  * dw )
+          print "sigmas", (i,j)
+          print sigmas
+          filename = figurePath + namePrefix + "_update" + str((i,j))
+          if updateC % 100 == 1:
+            plotGraph.plot1(filename+"Sigma", sigmas, "sigmas_"+str((i,j)))
+
+          gm = RM.feature2GaussianMatrix(cqt_med, sigmas)
+          L = scipy.sparse.csgraph.laplacian(gm, normed=True)
+
+          err = 0.5 * np.linalg.norm(L_true-L)**2
+          print "cur err: ", str(err)
+
+          if updateC % 100 == 1:
+            filename = figurePath + namePrefix + "_update" + str((i,j))
+            plotGraph.plot2(filename+"R", m_true, "m_true", gm, "gm")
+            plotGraph.plot2(filename+"L", L_true, "L_true", L, "L")
+
+  def batchUpdate():
+    accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt_med)
+    sigmas = sigmas - alpha * accu
+    sigmas = (sigmas + sigmas.T)/2
+
+  updateEachOne(gm, L, L_true, cqt_med, sigmas)
+
+
   print "sigmas:"
   print sigmas
 
-  filename = sigmaPath + namePrefix + "_step" + str(i) + ".npy"
+  filename = sigmaPath + namePrefix + "_step" + str(ep) + ".npy"
   print "saving sigmas to: ", filename
   np.save(filename, sigmas)
 
@@ -120,8 +164,10 @@ for i in xrange(epco):
   print "gm"
   print gm
 
-  filename = figurePath + namePrefix + "_epch" + str(i) + ".png"
-  plotGraph.plot2(filename, m_true, "m_true", gm, "gm")
+  filename = figurePath + namePrefix + "_epch" + str(i)
+  plotGraph.plot2(filename+"R", m_true, "m_true", gm, "gm")
+  plotGraph.plot2(filename+"L", L_true, "L_true", L, "L")
+  # plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
 
   err = 0.5 * np.linalg.norm(L_true-L)**2
   res += [err]
