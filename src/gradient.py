@@ -47,10 +47,15 @@ def L_analyticalGradient(m, x, y):
   np.fill_diagonal(g, 0)
   d = g.sum(axis = 1)
 
+  # mask = (d<10e-10)
+  # d[mask] = 1
+  # print mask
+
   res = np.array(m)
   res.fill(0)
   for i in xrange(limx):
     for j in xrange(i+1, limy):
+      # print "d[i], d[j]", (d[i], d[j])
       if (i==x and j==y) or (i==y and j==x):
         val = -1/(d[i]*d[j])**0.5 + m[i,j]*(d[i]+d[j])/(2*(d[i]*d[j])**1.5)
         res[i,j] = val
@@ -87,8 +92,8 @@ def allDLoss(sigma, L, L_true, RMatrix, features):
     for j in xrange(i+1, len(L)): #no i==j, due to dw is all zero
       dL = L_analyticalGradient(RMatrix,i,j)
       dw = dw_ij(i,j,sigma[i,j],features)
-      accu += 2 * (dL * dw) #due to its symmetric properity
-  return -1 * (L_true - L) * accu
+      accu += 2 * (L_true - L) * (dL * dw) #due to its symmetric properity
+  return -1 * accu
 
 # def allDLossII(sigma, L, L_true, RMatrix, features):
 #   # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
