@@ -10,7 +10,7 @@ sys.path.append('../src')
 import laplacian, gradient, plotGraph, librosaF
 import RecurrenceMatrix as RM
 
-epco, alpha, res, sigmaMul = 10, 3000, [], 1000
+epco, alpha, res, sigmaMul = 10, 1000, [], 1000
 np.random.seed(123)
 
 sigmaPath = "./sigmas/"
