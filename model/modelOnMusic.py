@@ -1,4 +1,4 @@
-import sys, scipy, os, warnings, librosa
+import sys, scipy, os, warnings, librosa, argparse
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 
@@ -10,7 +10,15 @@ sys.path.append('../src')
 import laplacian, gradient, plotGraph, librosaF
 import RecurrenceMatrix as RM
 
-epco, alpha, res, sigmaMul = 10, 1000, [], 1000
+parser = argparse.ArgumentParser()
+parser.add_argument("alpha", help="alpha for update step size")
+parser.add_argument("sigmaMul", help="sigmaMul for base of sigmas")
+
+args = parser.parse_args()
+alpha = args.alpha
+sigmaMul = args.sigmaMul
+
+epco, alpha, res = 10, []
 np.random.seed(123)
 
 sigmaPath = "./sigmas/"

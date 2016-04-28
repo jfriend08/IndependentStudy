@@ -15,4 +15,4 @@
 cd /scratch/yss265/IndependentStudy/model
 module load librosa
 # python model.py
-python modelOnMusic.py
+python modelOnMusic.py 
