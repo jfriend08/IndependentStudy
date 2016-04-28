@@ -65,14 +65,14 @@ def loadInterval2Frame(path, sr=22050, frameConversion=None):
 
 
 
-# sr, signal = mp32np('../data/audio/SALAMI_698.mp3')
-# y = signal[:,0]
-# print "Perform beat_track and cqt"
-# tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
-# cqt = librosa.cqt(y=y, sr=sr)
-# print "saving cqt and beats... "
-# np.save("cqt.npy", cqt)
-# np.save("beats.npy", beats)
+sr, signal = mp32np('../data/audio/SALAMI_698.mp3')
+y = signal[:,0]
+print "Perform beat_track and cqt"
+tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+cqt = librosa.cqt(y=y, sr=sr)
+print "saving cqt and beats... "
+np.save("cqt.npy", cqt)
+np.save("beats.npy", beats)
 
 print "Loading cqt and beats... "
 cqt = np.load('./cqt.npy')
@@ -167,7 +167,12 @@ for ep in xrange(epco):
   print "saving sigmas to: ", filename
   np.save(filename, sigmas)
 
-  gm = RM.feature2GaussianMatrix(cqt_med, sigmas)
+  newgm = RM.feature2GaussianMatrix(cqt_med, sigmas)
+
+  filename = sigmaPath + namePrefix + "_step" + str(ep) + ".npy"
+  print "saving sigmas to: ", filename
+  np.save(filename, sigmas)
+
   L = scipy.sparse.csgraph.laplacian(gm, normed=True)
   print "gm"
   print gm
