@@ -1,7 +1,10 @@
-import sys, scipy, os, librosa, warnings
+import sys, scipy, os, warnings
 
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
+
+import librosa
+
 from sklearn.feature_extraction import image
 import numpy as np
 import scipy.io.wavfile as wav
