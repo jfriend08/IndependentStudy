@@ -57,7 +57,7 @@ def L_analyticalGradient(m, x, y):
     for j in xrange(i+1, limy):
       # print "d[i], d[j]", (d[i], d[j])
       if (i==x and j==y) or (i==y and j==x):
-        val = -1/(d[i]*d[j])**0.5 + m[i,j]*(d[i]+d[j])/(2*(d[i]*d[j])**1.5)
+        val = -1/((d[i]*d[j])**0.5) + m[i,j]*(d[i]+d[j])/(2*(d[i]*d[j])**1.5)
         res[i,j] = val
         res[j,i] = val
       elif i==x or i==y:
@@ -78,6 +78,7 @@ def df1(x):
 def w_ij(i, j, sij, feature):
   diff = np.linalg.norm(feature[i]-feature[j])
   val = np.exp(-((diff/sij)**2))
+  # print "diff", str(diff), " sij", sij, " val", val
   return val
 
 def dw_ij(i, j, sij, feature):
@@ -92,8 +93,8 @@ def allDLoss(sigma, L, L_true, RMatrix, features):
     for j in xrange(i+1, len(L)): #no i==j, due to dw is all zero
       dL = L_analyticalGradient(RMatrix,i,j)
       dw = dw_ij(i,j,sigma[i,j],features)
-      accu += 2 * (L_true - L) * (dL * dw) #due to its symmetric properity
-  return -1 * accu
+      accu += 2 * (dL * dw) #due to its symmetric properity
+  return -1 * (L_true - L) * accu
 
 # def allDLossII(sigma, L, L_true, RMatrix, features):
 #   # m = np.array([[1,2,3,4,5],[2,1,2,3,4],[3,2,1,1,1],[4,3,1,1,1],[5,4,1,1,1]]).astype(float)
