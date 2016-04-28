@@ -17,6 +17,9 @@ sigmaPath = "./sigmas/"
 figurePath = "./fig/"
 namePrefix = "modelReal_batchUpdate_Alpha" + str(alpha)
 
+sigmaPath += namePrefix + '/'
+figurePath += namePrefix + '/'
+
 def mp32np(fname):
   oname = 'temp.wav'
   cmd = 'lame --decode {0} {1}'.format( fname,oname )
@@ -64,6 +67,12 @@ def loadInterval2Frame(path, sr=22050, frameConversion=None):
   return interval
 
 
+#check sigma and figure path, creat if not exist
+if not os.path.exists(sigmaPath):
+  os.makedirs(sigmaPath)
+if not os.path.exists(figurePath):
+  os.makedirs(figurePath)
+
 
 sr, signal = mp32np('../data/audio/SALAMI_698.mp3')
 y = signal[:,0]
@@ -82,8 +91,6 @@ sr = 44100
 print "Perform sync"
 cqt_med, frameConversion = librosaF.sync(cqt, beats, aggregate=np.median)
 cqt_med = cqt_med.T
-
-
 
 print "Perform loadInterval2Frame"
 interval = loadInterval2Frame("../data/anno/698/parsed/textfile1_uppercase.txt", sr, frameConversion)
@@ -112,8 +119,8 @@ print "m_true is symmetric: ", (m_true==np.transpose(m_true)).all()
 # plotGraph.plot2(namePrefix+"_R", m_true, "m_true", gm, "gm")
 # plotGraph.plot2(namePrefix+"_L", L_true, "L_true", L, "L")
 
-# filename = figurePath + namePrefix + "_orig.png"
-# plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
+filename = figurePath + namePrefix + "_orig.png"
+plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
 
 err = 0.5 * np.linalg.norm(L_true-L)**2
 print "errors: ", str(err)
@@ -172,10 +179,10 @@ for ep in xrange(epco):
   print "gm"
   print gm
 
-  filename = figurePath + namePrefix + "_epch" + str(ep)
-  plotGraph.plot2(filename+"R", m_true, "m_true", gm, "gm")
-  plotGraph.plot2(filename+"L", L_true, "L_true", L, "L")
-  # plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
+  filename = figurePath + "/" + namePrefix + "_epch" + str(ep)
+  # plotGraph.plot2(filename+"R", m_true, "m_true", gm, "gm")
+  # plotGraph.plot2(filename+"L", L_true, "L_true", L, "L")
+  plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
 
   err = 0.5 * np.linalg.norm(L_true-L)**2
   print "epoch: ", str(ep), " errors: ", str(err)

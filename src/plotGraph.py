@@ -23,7 +23,7 @@ def plot2(path, obj1, name1, obj2, name2):
   plt.savefig(path)
 
 def plot4(path, obj1, name1, obj2, name2, obj3, name3, obj4, name4):
-  plt.figure(figsize=(25, 5))
+  plt.figure(figsize=(15, 10))
   plt.subplot(2, 2, 1)
   plt.pcolor(obj1, cmap="viridis")
   plt.colorbar()
