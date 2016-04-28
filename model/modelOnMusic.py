@@ -1,9 +1,6 @@
-import sys, scipy, os, warnings
-
+import sys, scipy, os, warnings, librosa
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
-
-import librosa
 
 from sklearn.feature_extraction import image
 import numpy as np
@@ -13,7 +10,7 @@ sys.path.append('../src')
 import laplacian, gradient, plotGraph, librosaF
 import RecurrenceMatrix as RM
 
-epco, alpha, res, sigmaMul = 30, 2000, [], 10
+epco, alpha, res, sigmaMul = 30, 2000, [], 0.1
 np.random.seed(123)
 
 sigmaPath = "./sigmas/"
@@ -83,68 +80,72 @@ interval = loadInterval2Frame("../data/anno/698/parsed/textfile1_uppercase.txt",
 
 sigmas = np.random.rand(cqt_med.shape[0], cqt_med.shape[0])
 sigmas = ((sigmas + sigmas.T)/2)*sigmaMul
+print "sigmas"
+print sigmas
+
 gm = RM.feature2GaussianMatrix(cqt_med, sigmas) #(nSample, nFeature)
 L = scipy.sparse.csgraph.laplacian(gm, normed=True)
 
 print "gm.shape: ", gm.shape
+print gm
 
-m_true = RM.label2RecurrenceMatrix("../data/2.jams", gm.shape[0], interval)
-L_true = scipy.sparse.csgraph.laplacian(m_true, normed=True)
+# m_true = RM.label2RecurrenceMatrix("../data/2.jams", gm.shape[0], interval)
+# L_true = scipy.sparse.csgraph.laplacian(m_true, normed=True)
 
-print "gm.shape, m_true.shape: ", gm.shape, m_true.shape
-print "gm is symmetric: ", (gm==np.transpose(gm)).all()
-print "m_true is symmetric: ", (m_true==np.transpose(m_true)).all()
+# print "gm.shape, m_true.shape: ", gm.shape, m_true.shape
+# print "gm is symmetric: ", (gm==np.transpose(gm)).all()
+# print "m_true is symmetric: ", (m_true==np.transpose(m_true)).all()
 
-plotGraph.plot2('./realMusicRMatrix2', m_true, "m_true", gm, "gm")
-plotGraph.plot2('./realMusicLaplacian2', L_true, "L_true", L, "L")
+# plotGraph.plot2('./realMusicRMatrix2', m_true, "m_true", gm, "gm")
+# plotGraph.plot2('./realMusicLaplacian2', L_true, "L_true", L, "L")
 
-for i in xrange(epco):
-  accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt_med)
-  sigmas = sigmas - alpha * accu
-  sigmas = np.around(sigmas, decimals = 10)
+# for i in xrange(epco):
+#   accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt_med)
+#   sigmas = sigmas - alpha * accu
+#   sigmas = np.around(sigmas, decimals = 10)
 
-  filename = sigmaPath + namePrefix + "_step" + str(i) + ".npy"
-  print "saving sigmas to: ", filename
-  np.save(filename, sigmas)
+#   filename = sigmaPath + namePrefix + "_step" + str(i) + ".npy"
+#   print "saving sigmas to: ", filename
+#   np.save(filename, sigmas)
 
-  gm = RM.feature2GaussianMatrix(cqt_med, sigmas)
-  L = scipy.sparse.csgraph.laplacian(gm, normed=True)
+#   gm = RM.feature2GaussianMatrix(cqt_med, sigmas)
+#   L = scipy.sparse.csgraph.laplacian(gm, normed=True)
 
-  filename = figurePath + namePrefix + "_epch" + str(i) + ".png"
-  plotGraph.plot2(filename, m_true, "m_true", gm, "gm")
+#   filename = figurePath + namePrefix + "_epch" + str(i) + ".png"
+#   plotGraph.plot2(filename, m_true, "m_true", gm, "gm")
 
-  err = 0.5 * np.linalg.norm(L_true-L)**2
-  res += [err]
+#   err = 0.5 * np.linalg.norm(L_true-L)**2
+#   res += [err]
 
-print res
-
-
-
+# print res
 
 
 
 
 
-# print "Perform subsegment"
-# sub_beats = librosa.segment.subsegment(cqt, beats)
-# cqt_med_sub = librosa.util.sync(cqt, sub_beats, aggregate=np.median)
 
 
-# plt.figure()
-# plt.subplot(3, 1, 1)
-# librosa.display.specshow(librosa.logamplitude(cqt**2,ref_power=np.max),x_axis='time',sr=sr)
-# plt.colorbar(format='%+2.0f dB')
-# plt.title('CQT power, shape={}'.format(cqt.shape))
 
-# plt.subplot(3, 1, 2)
-# librosa.display.specshow(librosa.logamplitude(cqt_med**2,ref_power=np.max))
-# plt.colorbar(format='%+2.0f dB')
-# plt.title('Beat synchronous CQT power, ,shape={}'.format(cqt_med.shape))
+# # print "Perform subsegment"
+# # sub_beats = librosa.segment.subsegment(cqt, beats)
+# # cqt_med_sub = librosa.util.sync(cqt, sub_beats, aggregate=np.median)
 
-# plt.subplot(3, 1, 3)
-# librosa.display.specshow(librosa.logamplitude(cqt_med_sub**2,ref_power=np.max))
 
-# plt.colorbar(format='%+2.0f dB')
-# plt.title('Sub-beat synchronous CQT power, shape={}'.format(cqt_med_sub.shape))
-# plt.tight_layout()
-# plt.savefig('./test.png')
+# # plt.figure()
+# # plt.subplot(3, 1, 1)
+# # librosa.display.specshow(librosa.logamplitude(cqt**2,ref_power=np.max),x_axis='time',sr=sr)
+# # plt.colorbar(format='%+2.0f dB')
+# # plt.title('CQT power, shape={}'.format(cqt.shape))
+
+# # plt.subplot(3, 1, 2)
+# # librosa.display.specshow(librosa.logamplitude(cqt_med**2,ref_power=np.max))
+# # plt.colorbar(format='%+2.0f dB')
+# # plt.title('Beat synchronous CQT power, ,shape={}'.format(cqt_med.shape))
+
+# # plt.subplot(3, 1, 3)
+# # librosa.display.specshow(librosa.logamplitude(cqt_med_sub**2,ref_power=np.max))
+
+# # plt.colorbar(format='%+2.0f dB')
+# # plt.title('Sub-beat synchronous CQT power, shape={}'.format(cqt_med_sub.shape))
+# # plt.tight_layout()
+# # plt.savefig('./test.png')
