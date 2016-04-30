@@ -1,0 +1,7 @@
+Perform beat_track and cqt
+saving cqt and beats... 
+Loading cqt and beats... 
+Perform sync
+Perform loadInterval2Frame
+[[array([], dtype=float64), 'Silence'], [array([ 0, 18]), 'I'], [array([18, 50]), 'V'], [array([50, 81]), 'V'], [array([ 81, 113]), 'C'], [array([113, 130]), 'T'], [array([130, 161]), 'V'], [array([161, 193]), 'C'], [array([193, 242]), "T'"], [array([242, 274]), 'C'], [array([274, 321]), 'O'], [array([], dtype=float64), 'Silence']]
+[[array([ 0, 18]), 'I'], [array([18, 50]), 'V'], [array([50, 81]), 'V'], [array([ 81, 113]), 'C'], [array([113, 130]), 'T'], [array([130, 161]), 'V'], [array([161, 193]), 'C'], [array([193, 242]), "T'"], [array([242, 274]), 'C'], [array([274, 321]), 'O']]

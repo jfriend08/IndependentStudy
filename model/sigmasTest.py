@@ -96,5 +96,3 @@ plt.title('Laplacian Error per Steps')
 plt.xlabel("Steps")
 plt.ylabel("Laplacian Error(L_true - L)")
 plt.savefig('./test.png')
-
-

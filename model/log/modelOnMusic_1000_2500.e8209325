@@ -1,0 +1,12 @@
+
+/home/yss265/.bashrc: line 24: [: j: integer expression expected
+/share/apps/librosa/0.4.1/lib/python2.7/site-packages/librosa-0.4.1-py2.7.egg/librosa/core/audio.py:37: UserWarning: Could not import scikits.samplerate. Falling back to scipy.signal
+  warnings.warn('Could not import scikits.samplerate. '
+/share/apps/matplotlib/1.5.0/intel/lib/python2.7/site-packages/matplotlib-1.5.0-py2.7-linux-x86_64.egg/matplotlib/__init__.py:872: UserWarning: axes.color_cycle is deprecated and replaced with axes.prop_cycle; please use the latter.
+  warnings.warn(self.msg_depr % (key, alt_key))
+modelOnMusic.py:52: UserWarning: Warning: Points are in the same frame after conversion
+  warnings.warn("Warning: Points are in the same frame after conversion")
+/share/apps/matplotlib/1.5.0/intel/lib/python2.7/site-packages/matplotlib-1.5.0-py2.7-linux-x86_64.egg/matplotlib/pyplot.py:516: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+  max_open_warning, RuntimeWarning)
+
+

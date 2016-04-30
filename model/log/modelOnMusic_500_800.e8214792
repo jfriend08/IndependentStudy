@@ -1,0 +1,18 @@
+
+/home/yss265/.bashrc: line 25: [: j: integer expression expected
+/share/apps/librosa/0.4.1/lib/python2.7/site-packages/librosa-0.4.1-py2.7.egg/librosa/core/audio.py:37: UserWarning: Could not import scikits.samplerate. Falling back to scipy.signal
+  warnings.warn('Could not import scikits.samplerate. '
+/share/apps/matplotlib/1.5.0/intel/lib/python2.7/site-packages/matplotlib-1.5.0-py2.7-linux-x86_64.egg/matplotlib/__init__.py:872: UserWarning: axes.color_cycle is deprecated and replaced with axes.prop_cycle; please use the latter.
+  warnings.warn(self.msg_depr % (key, alt_key))
+modelOnMusic.py:53: UserWarning: Warning: Points are in the same frame after conversion
+  warnings.warn("Warning: Points are in the same frame after conversion")
+Traceback (most recent call last):
+  File "modelOnMusic.py", line 181, in <module>
+    sigmas = updateEachOne(gm, L, L_true, cqt_med, sigmas, res)
+  File "modelOnMusic.py", line 152, in updateEachOne
+    gm = RM.feature2GaussianMatrix(cqt_med, sigmas)
+  File "../src/RecurrenceMatrix.py", line 68, in feature2GaussianMatrix
+    raise ValueError('input sigmas matrix not symmetirc')
+ValueError: input sigmas matrix not symmetirc
+
+
