@@ -3,11 +3,13 @@ import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 
 from sklearn.feature_extraction import image
+from librosa.util import normalize
 import numpy as np
 import scipy.io.wavfile as wav
 
+
 sys.path.append('../src')
-import laplacian, gradient, plotGraph, librosaF
+import laplacian, gradient, plotGraph, librosaF, sigmaUpdate
 import RecurrenceMatrix as RM
 
 parser = argparse.ArgumentParser()
@@ -23,7 +25,7 @@ np.random.seed(123)
 
 sigmaPath = "./sigmas/"
 figurePath = "./fig/"
-namePrefix = "modelReal_singleTargetUpdateIII_Alpha" + str(alpha) + "_" + str(sigmaMul)
+namePrefix = "modelReal_newSingleUpdate_Alpha" + str(alpha) + "_" + str(sigmaMul)
 isBatch = False
 
 sigmaPath += namePrefix + '/'
@@ -100,6 +102,8 @@ sr = 44100
 print "Perform sync"
 cqt_med, frameConversion = librosaF.sync(cqt, beats, aggregate=np.median)
 cqt_med = cqt_med.T
+cqt_med = normalize(cqt_med, norm=2)
+print "cqt_med.shape: %s" % str(cqt_med.shape)
 
 print "Perform loadInterval2Frame"
 interval = loadInterval2Frame("../data/anno/698/parsed/textfile1_uppercase.txt", sr, frameConversion)
@@ -139,99 +143,16 @@ print "m_true is symmetric: ", (m_true==np.transpose(m_true)).all()
 # plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
 
 err = 0.5 * np.linalg.norm(L_true-L)**2
+res += [err]
 print "errors: ", str(err)
 
 for ep in xrange(epco):
-  def updateTargetEachOne(gm, L, L_true, cqt_med, sigmas, res):
-    updateC, loop = 0, 1000
-    while loop > 0:
-      loop -= 1
-
-      print 'where the max diff in L ...'
-      diffL = np.absolute(L_true-L)
-      x,y = np.unravel_index(diffL.argmax(), diffL.shape)
-      print "diffL: %s, L_true: %s, L: %s" % ((diffL[x,y]), L_true[x,y], L[x,y])
-      print (x,y)
-
-      dL = gradient.L_analyticalGradient(gm,x,y)
-      dw = gradient.dw_ij(x,y,sigmas[x,y],cqt_med)
-      print "dL(x,y): %s" %dL[x,y]
-      print "dw: %s" % dw
-      print 'cqt_med l2 diff is: %s' % np.linalg.norm(cqt_med[x]-cqt_med[y])
-      print 'w[x,y] is: %s, sigmas[x,y] is: %s' % (gm[x,y], sigmas[x,y])
-
-      diff = alpha * ( -1 * 2 * (L_true - L) * dL  * dw )
-
-      print 'diff-alpha will be ...'
-      maxdiff = np.absolute(diff)
-      print "the alpha-diff at location is: %s" % maxdiff[x,y]
-      x,y = np.unravel_index(maxdiff.argmax(), maxdiff.shape)
-      print "max in diff is: %s, location is: %s" % (np.amax(maxdiff), (x,y))
-
-      sigmas = sigmas - diff
-      gm = RM.feature2GaussianMatrix(cqt_med, sigmas)
-      L = scipy.sparse.csgraph.laplacian(gm, normed=True)
-
-      print 'after update. L diff at location: %s is %s' % (str((x,y)), L_true[x,y] - L[x,y])
-      print '\n'
-    return sigmas
-
-  def updateEachOne(gm, L, L_true, cqt_med, sigmas, res):
-    updateC = 0
-    # update each sigma and transfer to GM immediatly
-    for i in xrange(gm.shape[0]):
-      for j in xrange(i+1, gm.shape[0]):
-        if abs(L_true[i,j] - L[i,j]) > 1e-3: #only update the sigma where L is large
-          updateC += 1
-          dL = gradient.L_analyticalGradient(gm,i,j)
-          dw = gradient.dw_ij(i,j,sigmas[i,j],cqt_med)
-          diff = alpha * ( -1 * 2 * (L_true - L) * dL  * dw )
-
-          print 'alpha diff at', str((i,j))
-          maxdiff = np.absolute(diff)
-          x,y = np.unravel_index(maxdiff.argmax(), maxdiff.shape)
-          print np.amax(maxdiff)
-          print (x,y)
-
-          sigmas = sigmas - diff
-
-          gm = RM.feature2GaussianMatrix(cqt_med, sigmas)
-          L = scipy.sparse.csgraph.laplacian(gm, normed=True)
-
-          print 'L diff at', str((i,j))
-          diffL = np.absolute(L_true-L)
-          x,y = np.unravel_index(diffL.argmax(), diffL.shape)
-          print np.amax(diffL)
-          print (x,y)
-
-          err = 0.5 * np.linalg.norm(L_true-L)**2
-          res += [err]
-          # print "cur err: ", str(err)
-
-          # if updateC % 1000 == 1:
-          #   filename = figurePath + namePrefix + "_update" + str((i,j))
-          #   plotGraph.plot1(filename+"Sigma", sigmas, "sigmas_"+str((i,j)))
-          #   plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
-          #   plotGraph.plotLine(figurePath + namePrefix + "_err", res, 'Perplexity per Steps -- Validation')
-          #   # plotGraph.plot2(filename+"R", m_true, "m_true", gm, "gm")
-          #   # plotGraph.plot2(filename+"L", L_true, "L_true", L, "L")
-    return sigmas
-
-  def batchUpdate(gm, L, L_true, cqt_med, sigmas):
-    accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt_med)
-    sigmas = sigmas - alpha * accu
-    sigmas = (sigmas + sigmas.T)/2
-
-    filename = figurePath + namePrefix + "_BatchUpdate"
-    plotGraph.plot1(filename+"Sigma", sigmas, "sigmas")
-
-    return sigmas
-
+  '''update sigma'''
   if isBatch:
-    sigmas = batchUpdate(gm, L, L_true, cqt_med, sigmas)
+    sigmas = sigmaUpdate.batchUpdate(gm, L, L_true, cqt_med, sigmas, alpha, figurePath, namePrefix)
   else:
-    # sigmas = updateEachOne(gm, L, L_true, cqt_med, sigmas, res)
-    sigmas = updateTargetEachOne(gm, L, L_true, cqt_med, sigmas, res)
+    sigmas = sigmaUpdate.updateEachOne(gm, L, L_true, cqt_med, sigmas, res, alpha, figurePath, namePrefix)
+    # sigmas = updateTargetEachOne(gm, L, L_true, cqt_med, sigmas, res)
 
   print "sigmas:"
   print sigmas
