@@ -2,7 +2,7 @@
 
 #PBS -V
 #PBS -S /bin/bash
-#PBS -N modelOnMusic_batch_1000_700
+#PBS -N newUpdates
 #PBS -l nodes=1:ppn=1
 #PBS -l walltime=15:00:00
 #PBS -M yss265@nuy.edu
@@ -15,5 +15,5 @@
 cd /scratch/yss265/IndependentStudy/model
 module load librosa
 # python model.py
-python modelOnMusic.py $alpha $sigmaMul
-# python modelOnMusic.py 1000 700
+# python modelOnMusic.py $alpha $sigmaMul
+python modelOnMusic.py 20 20

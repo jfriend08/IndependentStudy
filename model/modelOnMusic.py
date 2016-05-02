@@ -139,8 +139,8 @@ print "m_true is symmetric: ", (m_true==np.transpose(m_true)).all()
 # plotGraph.plot2(namePrefix+"_R", m_true, "m_true", gm, "gm")
 # plotGraph.plot2(namePrefix+"_L", L_true, "L_true", L, "L")
 
-# filename = figurePath + namePrefix + "_orig.png"
-# plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
+filename = figurePath + namePrefix + "_orig.png"
+plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
 
 err = 0.5 * np.linalg.norm(L_true-L)**2
 res += [err]
@@ -175,8 +175,8 @@ for ep in xrange(epco):
   print "epoch: ", str(ep), " errors: ", str(err)
   res += [err]
 
-  if isBatch:
-    plotGraph.plotLine(figurePath + namePrefix + "_err", res, 'Perplexity per Steps -- Validation')
+
+  plotGraph.plotLine(figurePath + namePrefix + "_err", res, 'Error per epoch')
 
 print res
 

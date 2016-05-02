@@ -1,6 +1,9 @@
 import numpy as np
-import scipy.sparse, math
+import scipy.sparse, math, sys
 from scipy.sparse import isspmatrix
+
+sys.path.append('../src')
+import RecurrenceMatrix as RM
 
 def getLaplacianMatrix(m):
   g = np.array(m)
@@ -16,6 +19,76 @@ def getLaplacianMatrix(m):
   res = np.fromfunction(getVal, m.shape)
   np.fill_diagonal(res, 1)
   return res
+
+def L_analyticalGradientII(m, x, y, L_true, L, features, sigma):
+  '''
+  @para {m}: Should have to be recurrenc matrix
+
+  This is function calculating:
+  1. deriative of L w.r.t W at (x,y)
+  2. times deriative of W at (x,y) w.r.t sigma at (x,y)
+  3. times L_true, L difference ar (x,y)
+  '''
+  limx, limy = m.shape
+
+  if x > limx or y > limy:
+    raise ValueError('Position outside matrix')
+  # if x == y:
+  #   raise ValueError('Cannot no self weighting')
+
+  g = m.copy()
+  # g = np.array(m)
+  np.fill_diagonal(g, 0)
+  d = g.sum(axis = 1)
+
+  res = np.array(m)
+  res.fill(0)
+  for i in xrange(limx):
+    for j in xrange(i+1, limy):
+      needUpdate = False
+      dw = dw_ij(i,j,sigma[i,j],features)
+      dl = L_true[i,j]-L[i,j]
+      if (i==x and j==y) or (i==y and j==x):
+        val = -1/((d[i]*d[j])**0.5) + m[i,j]*(d[i]+d[j])/(2*(d[i]*d[j])**1.5)
+        needUpdate = True
+      elif i==x or i==y:
+        val =  m[i,j]/(2*((d[i]**1.5) * (d[j]**0.5)))
+        needUpdate = True
+      elif j==x or j==y:
+        val =  m[i,j]/(2*((d[j]**1.5) * (d[i]**0.5)))
+        needUpdate = True
+
+      if needUpdate:
+        val = (0 if np.isnan(val) else val)
+        # print "loc: %s, res[i,j]: %s, dw: %s, dl: %s, val: %s, m[i,j]: %s, d[i]: %s, d[j]: %s" % (str((i,j)), res[i,j], dw, dl, val, m[i,j], d[i], d[j])
+
+        res[i,j] = dl * -1 * val * dw
+        res[j,i] = dl * -1 * val * dw
+  return res
+
+def L_numericalGradientII(m, pos1, pos2, L_true, L, features, sigmas, cqt_med):
+  '''
+  @para {m}: Should have to be recurrenc matrix
+
+  This is the same objective as def L_analyticalGradientII, but using numerical approach
+  '''
+  delta = 1e-8
+  sigmas1 = sigmas.copy()
+  sigmas1[pos1,pos2] = sigmas1[pos1,pos2] + delta
+  sigmas1[pos2,pos1] = sigmas1[pos2,pos1] + delta
+  gm1 = RM.feature2GaussianMatrix(cqt_med, sigmas1) #(nSample, nFeature)
+  L1 = scipy.sparse.csgraph.laplacian(gm1, normed=True)
+  J1 = 0.5 * (np.linalg.norm(L_true - L1))**2
+
+  sigmas2 = sigmas.copy()
+  sigmas2[pos1,pos2] = sigmas2[pos1,pos2] - delta
+  sigmas2[pos2,pos1] = sigmas2[pos2,pos1] - delta
+  gm2 = RM.feature2GaussianMatrix(cqt_med, sigmas2) #(nSample, nFeature)
+  L2 = scipy.sparse.csgraph.laplacian(gm2, normed=True)
+  J2 = 0.5 * (np.linalg.norm(L_true - L2))**2
+
+  dJ_num = (J1-J2)/(2*delta)
+  return dJ_num
 
 def L_numericalGradient(m, x, y):
   limx, limy = m.shape
@@ -36,6 +109,9 @@ def L_numericalGradient(m, x, y):
   return (l1-l2)/(2*d)
 
 def L_analyticalGradient(m, x, y):
+  '''
+  This is function calculating deriative of L r.w.t W at (x,y).
+  '''
   limx, limy = m.shape
 
   if x > limx or y > limy:
