@@ -4,7 +4,7 @@
 #PBS -S /bin/bash
 #PBS -N newUpdates
 #PBS -l nodes=1:ppn=1
-#PBS -l walltime=15:00:00
+#PBS -l walltime=24:00:00
 #PBS -M yss265@nuy.edu
 #PBS -l mem=10GB
 #PBS -q s48
@@ -15,5 +15,5 @@
 cd /scratch/yss265/IndependentStudy/model
 module load librosa
 # python model.py
-# python modelOnMusic.py $alpha $sigmaMul
-python modelOnMusic.py 20 20
+python modelOnMusic.py $alpha $sigmaMul
+# python modelOnMusic.py 20 20

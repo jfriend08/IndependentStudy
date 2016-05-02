@@ -25,7 +25,7 @@ np.random.seed(123)
 
 sigmaPath = "./sigmas/"
 figurePath = "./fig/"
-namePrefix = "modelReal_newSingleUpdate_Alpha" + str(alpha) + "_" + str(sigmaMul)
+namePrefix = "test_newUpdate_Alpha" + str(alpha) + "_" + str(sigmaMul)
 isBatch = False
 
 sigmaPath += namePrefix + '/'
@@ -102,13 +102,16 @@ sr = 44100
 print "Perform sync"
 cqt_med, frameConversion = librosaF.sync(cqt, beats, aggregate=np.median)
 cqt_med = cqt_med.T
-cqt_med = normalize(cqt_med, norm=2)
+# cqt_med = normalize(cqt_med, norm=2)
 print "cqt_med.shape: %s" % str(cqt_med.shape)
 
 print "Perform loadInterval2Frame"
 interval = loadInterval2Frame("../data/anno/698/parsed/textfile1_uppercase.txt", sr, frameConversion)
 
-sigmas = np.random.rand(cqt_med.shape[0], cqt_med.shape[0])
+base = 10
+if sigmaMul >= base:
+  raise ValueError('Sigma noise exceed base. Sigma has to be possitive')
+sigmas = np.ones((cqt_med.shape[0], cqt_med.shape[0])) * base + np.random.rand(cqt_med.shape[0], cqt_med.shape[0])
 sigmas = ((sigmas + sigmas.T)/2) * sigmaMul
 
 print "sigmas"

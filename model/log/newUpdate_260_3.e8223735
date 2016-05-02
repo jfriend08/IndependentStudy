@@ -1,0 +1,24 @@
+
+/home/yss265/.bashrc: line 25: [: j: integer expression expected
+/share/apps/librosa/0.4.1/lib/python2.7/site-packages/librosa-0.4.1-py2.7.egg/librosa/core/audio.py:37: UserWarning: Could not import scikits.samplerate. Falling back to scipy.signal
+  warnings.warn('Could not import scikits.samplerate. '
+/share/apps/matplotlib/1.5.0/intel/lib/python2.7/site-packages/matplotlib-1.5.0-py2.7-linux-x86_64.egg/matplotlib/__init__.py:872: UserWarning: axes.color_cycle is deprecated and replaced with axes.prop_cycle; please use the latter.
+  warnings.warn(self.msg_depr % (key, alt_key))
+modelOnMusic.py:55: UserWarning: Warning: Points are in the same frame after conversion
+  warnings.warn("Warning: Points are in the same frame after conversion")
+Traceback (most recent call last):
+  File "modelOnMusic.py", line 175, in <module>
+    plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
+  File "../src/plotGraph.py", line 38, in plot4
+    plt.savefig(path)
+  File "/share/apps/matplotlib/1.5.0/intel/lib/python2.7/site-packages/matplotlib-1.5.0-py2.7-linux-x86_64.egg/matplotlib/pyplot.py", line 688, in savefig
+    res = fig.savefig(*args, **kwargs)
+  File "/share/apps/matplotlib/1.5.0/intel/lib/python2.7/site-packages/matplotlib-1.5.0-py2.7-linux-x86_64.egg/matplotlib/figure.py", line 1539, in savefig
+    self.canvas.print_figure(*args, **kwargs)
+  File "/share/apps/matplotlib/1.5.0/intel/lib/python2.7/site-packages/matplotlib-1.5.0-py2.7-linux-x86_64.egg/matplotlib/backend_bases.py", line 2230, in print_figure
+    **kwargs)
+  File "/share/apps/matplotlib/1.5.0/intel/lib/python2.7/site-packages/matplotlib-1.5.0-py2.7-linux-x86_64.egg/matplotlib/backends/backend_agg.py", line 532, in print_png
+    filename_or_obj = open(filename_or_obj, 'wb')
+IOError: [Errno 2] No such file or directory: u'./fig/modelReal_newUpdate_Alpha260_3//modelReal_newUpdate_Alpha260_3_epch22.png'
+
+
