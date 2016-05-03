@@ -15,5 +15,5 @@
 cd /scratch/yss265/IndependentStudy/model
 module load librosa
 # python model.py
-python modelOnMusic.py $alpha $sigmaMul
+python modelOnMusic.py $alpha > $jobName
 # python modelOnMusic.py 20 20
