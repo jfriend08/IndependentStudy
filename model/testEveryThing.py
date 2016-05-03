@@ -73,7 +73,7 @@ def testProperSigma():
     print "Loading cqt_med"
     cqt_med = np.load("./tempArray/cqt_med.npy")
 
-  sigmas = np.random.rand(cqt_med.shape[0], cqt_med.shape[0])
+  sigmas = np.random.rand(cqt_med.shape[0], cqt_med.shape[0]) + 1e-7
   sigmas = ((sigmas + sigmas.T)/2)
 
   gm = RM.feature2GaussianMatrix(cqt_med, sigmas) #(nSample, nFeature)
@@ -85,10 +85,12 @@ def testProperSigma():
   print "gm [min, max]: %s" % str((gm.min(), gm.max()))
   print "L [min, max]: %s" % str((L.min(), L.max()))
 
-  alpha = 100000
+  alpha = 2
   result = {'isLijGettingCloser':[], 'isWholeLossSmaller':[]}
   for i in xrange(gm.shape[0]):
     for j in xrange(i+1, gm.shape[0]):
+      if abs(L_true[i,j] - L[i,j]) < 1e-2:
+        continue
       dJij_num = gradient.L_analyticalGradientII(gm, i,j, L_true, L, cqt_med, sigmas)
       dJij_anal = gradient.L_numericalGradientII(gm, i,j, L_true, L, cqt_med, sigmas, cqt_med)
       newSig = sigmas[i,j] - 1 * alpha * dJij_anal
