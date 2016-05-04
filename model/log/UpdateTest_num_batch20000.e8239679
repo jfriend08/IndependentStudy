@@ -1,0 +1,32 @@
+
+/home/yss265/.bashrc: line 25: [: j: integer expression expected
+numpy/intel/1.10.1(28):ERROR:150: Module 'numpy/intel/1.10.1' conflicts with the currently loaded module(s) 'numpy/intel/1.9.2'
+numpy/intel/1.10.1(28):ERROR:102: Tcl command execution failed: conflict ${my_name}
+
+numpy/intel/1.10.1(28):ERROR:150: Module 'numpy/intel/1.10.1' conflicts with the currently loaded module(s) 'numpy/intel/1.9.2'
+numpy/intel/1.10.1(28):ERROR:102: Tcl command execution failed: conflict ${my_name}
+
+numpy/intel/1.10.1(28):ERROR:150: Module 'numpy/intel/1.10.1' conflicts with the currently loaded module(s) 'numpy/intel/1.9.2'
+numpy/intel/1.10.1(28):ERROR:102: Tcl command execution failed: conflict ${my_name}
+
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "modelOnMusic.py", line 1, in <module>
+    import sys, scipy, os, warnings, librosa, argparse
+  File "/share/apps/librosa/0.4.1/lib/python2.7/site-packages/librosa-0.4.1-py2.7.egg/librosa/__init__.py", line 15, in <module>
+    from . import core
+  File "/share/apps/librosa/0.4.1/lib/python2.7/site-packages/librosa-0.4.1-py2.7.egg/librosa/core/__init__.py", line 88, in <module>
+    from .time_frequency import *  # pylint: disable=wildcard-import
+  File "/share/apps/librosa/0.4.1/lib/python2.7/site-packages/librosa-0.4.1-py2.7.egg/librosa/core/time_frequency.py", line 9, in <module>
+    from ..util.exceptions import ParameterError
+  File "/share/apps/librosa/0.4.1/lib/python2.7/site-packages/librosa-0.4.1-py2.7.egg/librosa/util/__init__.py", line 81, in <module>
+    from .utils import *  # pylint: disable=wildcard-import
+  File "/share/apps/librosa/0.4.1/lib/python2.7/site-packages/librosa-0.4.1-py2.7.egg/librosa/util/utils.py", line 6, in <module>
+    import scipy.ndimage
+  File "/share/apps/scipy/0.16.0/intel/lib/python2.7/site-packages/scipy/ndimage/__init__.py", line 172, in <module>
+    from .filters import *
+  File "/share/apps/scipy/0.16.0/intel/lib/python2.7/site-packages/scipy/ndimage/filters.py", line 36, in <module>
+    from . import _nd_image
+ImportError: numpy.core.multiarray failed to import
+
+

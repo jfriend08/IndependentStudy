@@ -22,8 +22,9 @@ np.random.seed(123)
 
 sigmaPath = "./sigmas/"
 figurePath = "./fig/"
-namePrefix = "newUpdateIII_Alpha" + str(alpha)
+namePrefix = "UpdateTest_ana_singleII_Alpha" + str(alpha)
 isBatch = False
+analytical = True
 
 sigmaPath += namePrefix + '/'
 figurePath += namePrefix + '/'
@@ -66,6 +67,7 @@ gm = RM.feature2GaussianMatrix(cqt_med, sigmas) #(nSample, nFeature)
 L = scipy.sparse.csgraph.laplacian(gm, normed=True)
 m_true = RM.label2RecurrenceMatrix("../data/2.jams", gm.shape[0], interval)
 L_true = scipy.sparse.csgraph.laplacian(m_true, normed=True)
+np.save("./tempArray/L_true.npy", L_true)
 
 print "cqt_med [min, max]: %s" % str((cqt_med.min(), cqt_med.max()))
 print "sigmas [min, max]: %s" % str((sigmas.min(), sigmas.max()))
@@ -82,9 +84,11 @@ print "errors: ", str(err)
 for ep in xrange(epco):
   '''update sigma'''
   if isBatch:
-    sigmas = sigmaUpdate.batchUpdate(gm, L, L_true, cqt_med, sigmas, alpha, figurePath, namePrefix)
+    print "isBatch"
+    sigmas = sigmaUpdate.updateBatch(gm, L, m_true, L_true, cqt_med, sigmas, alpha, figurePath, namePrefix, ep, analytical)
   else:
-    sigmas = sigmaUpdate.updateEachOne(gm, L, m_true, L_true, cqt_med, sigmas, alpha, figurePath, namePrefix, ep)
+    print "single update"
+    sigmas = sigmaUpdate.updateEachOne(gm, L, m_true, L_true, cqt_med, sigmas, alpha, figurePath, namePrefix, ep, analytical)
     # sigmas = updateTargetEachOne(gm, L, L_true, cqt_med, sigmas, res)
 
   gm = RM.feature2GaussianMatrix(cqt_med, sigmas)

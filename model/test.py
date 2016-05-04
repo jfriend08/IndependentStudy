@@ -1,14 +1,15 @@
 import numpy as np
-sigmas0 = np.load('./sigmas/modelReal_batchUpdate_Alpha3000_step0.npy')
-# sigmas1 = np.load('./sigmas/modelReal_Alpha2000_step1.npy')
-# sigmas2 = np.load('./sigmas/modelReal_Alpha2000_step2.npy')
 
-# for i in xrange(sigmas0.shape[0]):
-#   print (sigmas0[i,:] == sigmas1[i,:]).all()
-#   print (sigmas1[i,:] == sigmas2[i,:]).all()
-#   print (sigmas0[i,:] == sigmas2[i,:]).all()
-#   print '----------------------------------'
+def updateSomething(m):
+  m[1,2] = 4
+  m[2,1] = 4
+  return m
 
-for elm in sigmas0:
-  print elm
-print (sigmas0==sigmas0.T).all()
+
+def main():
+  sigmas = np.random.rand(5, 5) + 1e-7 #add a base in case of 0 sigma
+  sigmas = (sigmas + sigmas.T)/2
+  updateSomething(sigmas)
+  print sigmas
+
+main()

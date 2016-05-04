@@ -47,6 +47,62 @@ def testDWoverDSigma():
 
       print "is small: %s, dw_num: %s, dw_ana: %s" % (abs(dw_num-dw_ana) < 1e-10, dw_num, dw_ana)
 
+def testWhereDLDsigmaDifferent():
+  '''
+  Looks like DJ/DSigma from numerical and analytical are different
+  This is to test where does the difference occured
+  '''
+  def mp32np(fname):
+    oname = 'temp.wav'
+    cmd = 'lame --decode {0} {1}'.format( fname,oname )
+    os.system(cmd)
+    return wav.read(oname)
+  sr, signal = mp32np('../data/audio/SALAMI_698.mp3')
+  y = signal[:,0]
+
+  if not os.path.exists("./tempArray/cqt_med.npy"):
+    print "Perform beat_track and cqt"
+    tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+    cqt = librosa.cqt(y=y, sr=sr)
+    cqt_med, frameConversion = librosaF.sync(cqt, beats, aggregate=np.median)
+    cqt_med = cqt_med.T
+    cqt_med = normalize(cqt_med, norm=2)
+    np.save("./tempArray/cqt_med.npy", cqt_med)
+  else:
+    print "Loading cqt_med"
+    cqt_med = np.load("./tempArray/cqt_med.npy")
+
+  sigmas = np.random.rand(cqt_med.shape[0], cqt_med.shape[0]) + 1e-7
+  sigmas = ((sigmas + sigmas.T)/2)
+
+  gm = RM.feature2GaussianMatrix(cqt_med, sigmas) #(nSample, nFeature)
+  L = scipy.sparse.csgraph.laplacian(gm, normed=True)
+  L_true = np.load("./tempArray/L_true.npy")
+
+  print "cqt_med [min, max]: %s" % str((cqt_med.min(), cqt_med.max()))
+  print "sigmas [min, max]: %s" % str((sigmas.min(), sigmas.max()))
+  print "gm [min, max]: %s" % str((gm.min(), gm.max()))
+  print "L [min, max]: %s" % str((L.min(), L.max()))
+
+  alpha = 2
+  for i in xrange(gm.shape[0]):
+    for j in xrange(i+1, gm.shape[0]):
+      start_time = time.time()
+      dJij_anal = gradient.L_analyticalGradientII(gm, i,j, L_true, L, cqt_med, sigmas)
+      timeAnal = time.time() - start_time
+
+      start_time = time.time()
+      dJij_num = gradient.L_numericalGradientII(gm, i,j, L_true, L, cqt_med, sigmas, cqt_med)
+      timeNum = time.time() - start_time
+
+      start_time = time.time()
+      dJij_anal_matrix = gradient.L_analyticalGradientII_getMatrix(gm, i,j, L_true, L, cqt_med, sigmas)
+      dJij_anal_matrixSum = dJij_anal_matrix.sum()
+      timeAnaMatrix = time.time() - start_time
+
+      print "dJij_num: %s, dJij_anal: %s, dJij_anal_matrix.sum(): %s" % ( dJij_num, dJij_anal, dJij_anal_matrixSum)
+      print "timeNum: %s, timeAnal:%s, timeAnaMatrix: %s\n" % (timeNum, timeAnal, timeAnaMatrix)
+
 def testProperSigma():
   '''
   This is the test to find the proper sigma.
@@ -108,8 +164,6 @@ def testProperSigma():
       print "L_true[i,j]: %s, L[i,j] from %s --> %s, isLijGettingCloser: %s, isWholeLossSmaller: %s" % (L_true[i,j], L[i,j], newL[i,j], isLijGettingCloser, isWholeLossSmaller)
       print "update difference: %s percent\n" % ( ((-1 * alpha * dJij_num) - (-1 * alpha * dJij_anal))/(-1 * alpha * dJij_anal)  )
 
-
-
 def testDLOSSoverDsigma():
   nsample, nfeature = 322, 75
   delta = 1e-8
@@ -162,4 +216,4 @@ def testDLOSSoverDsigma():
       # print "start comparison ..."
       print "dJ12_anal: %s, dJ12_num: %s, diff percentage: %s" % (dJ12_anal, dJ12_num, (dJ12_anal-dJ12_num)/dJ12_anal)
 
-testProperSigma()
+testWhereDLDsigmaDifferent()
