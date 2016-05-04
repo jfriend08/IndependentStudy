@@ -14,20 +14,26 @@ import RecurrenceMatrix as RM
 
 parser = argparse.ArgumentParser()
 parser.add_argument("alpha", help="alpha for update step size")
+parser.add_argument("namePrefix", help="name prefix for figures and files")
 args = parser.parse_args()
-alpha = int(args.alpha)
 
+
+'''All parameter should be just here'''
 epco, res = 50, []
 np.random.seed(123)
 
 sigmaPath = "./sigmas/"
 figurePath = "./fig/"
-namePrefix = "UpdateTest_ana_singleII_Alpha" + str(alpha)
+
+alpha = int(args.alpha)
+namePrefix = args.namePrefix
+namePrefix = namePrefix + "_Alpha" + str(alpha)
 isBatch = False
-analytical = True
+analytical = False
 
 sigmaPath += namePrefix + '/'
 figurePath += namePrefix + '/'
+
 
 #check sigma and figure path, creat if not exist
 if not os.path.exists(sigmaPath):
@@ -104,7 +110,7 @@ for ep in xrange(epco):
   err = 0.5 * np.linalg.norm(L_true-L)**2
   print "epoch: ", str(ep), " errors: ", str(err)
   res += [err]
-  plotGraph.plotLine(figurePath + namePrefix + "_err", res, 'Error per epoch')
+  plotGraph.plotLine(figurePath + namePrefix + "_epch" + str(ep) + "_err", res, 'Error per epoch')
 
 print res
 
