@@ -29,7 +29,7 @@ alpha = int(args.alpha)
 namePrefix = args.namePrefix
 namePrefix = namePrefix + "_Alpha" + str(alpha)
 isBatch = False
-analytical = False
+analytical = True
 
 sigmaPath += namePrefix + '/'
 figurePath += namePrefix + '/'
