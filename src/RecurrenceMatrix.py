@@ -57,6 +57,22 @@ def gaussianKernel(m, c=0.5):
       res[j][i] = val
   return res
 
+def featureQ2GaussianMatrix(feature, Q):
+  if not (feature.shape[1]==Q.shape[0]):
+    raise ValueError('Q not match with feature')
+
+  nSample, nFeature = feature.shape
+  a = np.ones((1, nSample))[0]
+  m = np.diag(a, 0)
+  for i in xrange(nSample):
+    for j in xrange(i+1, nSample):
+      diff = feature[i,:] - feature[j,:]
+      val = (diff*diff*Q).sum()
+      # print "diff: %s, val: %s" % (diff, val)
+      m[i,j] = val
+      m[j,i] = val
+  return m
+
 def feature2GaussianMatrix(feature, sigmas):
   '''
   Given features along time frame, and returnning the pair-wise gaussian similarity

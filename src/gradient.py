@@ -20,6 +20,23 @@ def getLaplacianMatrix(m):
   np.fill_diagonal(res, 1)
   return res
 
+def L_numericalGradientQII(L_true, features, Q, qidx, cqt_med):
+  delta = 1e-9
+  Q1, Q2 = Q.copy(), Q.copy()
+
+  Q1[qidx] += delta
+  m1 = RM.featureQ2GaussianMatrix(cqt_med, Q1)
+  L1 = scipy.sparse.csgraph.laplacian(m1, normed=True)
+  J1 = 0.5 * (np.linalg.norm(L_true - L1))**2
+
+  Q2[qidx] -= delta
+  m2 = RM.featureQ2GaussianMatrix(cqt_med, Q2)
+  L2 = scipy.sparse.csgraph.laplacian(m2, normed=True)
+  J2 = 0.5 * (np.linalg.norm(L_true - L2))**2
+
+  dJ_num = (J1-J2)/(2*delta)
+  return dJ_num
+
 def L_analyticalGradientII_getMatrix(m, x, y, L_true, L, features, sigma):
   '''
   @para {m}: Should have to be recurrenc matrix
