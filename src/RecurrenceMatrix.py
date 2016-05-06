@@ -68,12 +68,13 @@ def feature2GaussianMatrix(feature, sigmas):
     raise ValueError('input sigmas matrix not symmetirc')
 
   nSample, nFeature = feature.shape
+  minDiff, maxDiff = sys.float_info.max, sys.float_info.min
   a = np.ones((1, nSample))[0]
   m = np.diag(a, 0)
   for i in xrange(nSample):
     for j in xrange(i+1, nSample):
-      # diff = np.power(np.linalg.norm(feature[i]-feature[j]),2)
-      # val = np.exp(-diff/sigmas[i,j]**2)
+      diff = np.linalg.norm(feature[i]-feature[j])
+      minDiff, maxDiff = min(minDiff, diff), max(maxDiff, diff)
       val = gradient.w_ij(i, j, sigmas[i,j], feature) #call value from gradient module
       m[i,j] = val
       m[j,i] = val

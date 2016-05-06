@@ -41,55 +41,54 @@ def updateTargetEachOne(gm, L, L_true, cqt_med, sigmas, res, alpha, figurePath, 
     print '\n'
   return sigmas
 
-def updateEachOne(gm, L, L_true, cqt_med, sigmas, res, alpha, figurePath, namePrefix):
-  updateC = 0
-  # update each sigma and transfer to GM immediatly
+def updateBatch(gm, L, m_true, L_true, cqt_med, sigmas, alpha, figurePath, namePrefix, epoch, analytical=True):
+  res = sigmas.copy()
   for i in xrange(gm.shape[0]):
     for j in xrange(i+1, gm.shape[0]):
-      if abs(L_true[i,j] - L[i,j]) > 1e-2: #only update the sigma where L is large
+      if abs(L_true[i,j] - L[i,j]) < 1e-3: #only update the sigma where L-difference is large
+        continue
+
+      if analytical:
+        # print "analytical"
+        dJij_dSigma = gradient.L_analyticalGradientII_getMatrix(gm, i,j, L_true, L, cqt_med, sigmas)
+      else:
+        # print "numerical"
+        dJij_dSigma = gradient.L_numericalGradientII(gm, i,j, L_true, L, cqt_med, sigmas, cqt_med)
+
+      res[i,j] = sigmas[i,j] - alpha * dJij_dSigma
+      res[j,i] = sigmas[j,i] - alpha * dJij_dSigma
+
+  return res
+
+def updateEachOne(gm, L, m_true, L_true, cqt_med, sigmas, alpha, figurePath, namePrefix, epoch, analytical=True):
+  res, updateC = [], 0
+  sigmasCopy = sigmas.copy()
+  for i in xrange(gm.shape[0]):
+    for j in xrange(i+1, gm.shape[0]):
+      if abs(L_true[i,j] - L[i,j]) > 1e-2: #only update the sigma where L-difference is large
         updateC += 1
-        print "Update at: %s" % str((i,j))
-        '''New update version'''
-        # dJij_anal_matrix = gradient.L_analyticalGradientII(gm, i,j, L_true, L, cqt_med, sigmas)
-        # dJij_anal = dJij_anal_matrix.sum()
-        dJij_anal = gradient.L_numericalGradientII(gm, i,j, L_true, L, cqt_med, sigmas, cqt_med)
-        sigmas[i,j] = sigmas[i,j] - alpha * dJij_anal
-        sigmas[j,i] = sigmas[j,i] - alpha * dJij_anal
 
-        '''Previous update version'''
-        # dL = gradient.L_analyticalGradient(gm,i,j)
-        # dw = gradient.dw_ij(i,j,sigmas[i,j],cqt_med)
-        # diff = alpha * ( -1 * 2 * (L_true - L) * dL  * dw )
+        if analytical:
+          # print "analytical"
+          analMatix = gradient.L_analyticalGradientII_getMatrix(gm, i,j, L_true, L, cqt_med, sigmasCopy)
+          dJij_dSigma = analMatix.sum()
+        else:
+          # print "numerical"
+          dJij_dSigma = gradient.L_numericalGradientII(gm, i,j, L_true, L, cqt_med, sigmasCopy, cqt_med)
 
-        # print 'alpha diff at', str((i,j))
-        # maxdiff = np.absolute(diff)
-        # x,y = np.unravel_index(maxdiff.argmax(), maxdiff.shape)
-        # print np.amax(maxdiff)
-        # print (x,y)
-        # sigmas = sigmas - diff
+        sigmasCopy[i,j] = sigmasCopy[i,j] - alpha * dJij_dSigma
+        sigmasCopy[j,i] = sigmasCopy[j,i] - alpha * dJij_dSigma
 
-        # gm = RM.feature2GaussianMatrix(cqt_med, sigmas)
-        # L = scipy.sparse.csgraph.laplacian(gm, normed=True)
+        gm = RM.feature2GaussianMatrix(cqt_med, sigmasCopy)
+        L = scipy.sparse.csgraph.laplacian(gm, normed=True)
 
-        # err = 0.5 * np.linalg.norm(L_true-L)**2
-        # res += [err]
-        # print "cur err: ", str(err)
+        err = 0.5 * np.linalg.norm(L_true-L)**2
+        res += [err]
+        print "cur err: %s at: %s \n" % (str(err), str((i,j)))
 
-        # if updateC % 1000 == 1:
-        #   filename = figurePath + namePrefix + "_update" + str((i,j))
-        #   plotGraph.plot1(filename+"Sigma", sigmas, "sigmas_"+str((i,j)))
-        #   plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
-        #   plotGraph.plotLine(figurePath + namePrefix + "_err", res, 'Perplexity per Steps -- Validation')
-          # plotGraph.plot2(filename+"R", m_true, "m_true", gm, "gm")
-          # plotGraph.plot2(filename+"L", L_true, "L_true", L, "L")
-  return sigmas
-
-def batchUpdate(gm, L, L_true, cqt_med, sigmas, alpha, figurePath, namePrefix):
-  accu = gradient.allDLoss(sigmas, L, L_true, gm, cqt_med)
-  sigmas = sigmas - alpha * accu
-  sigmas = (sigmas + sigmas.T)/2
-
-  filename = figurePath + namePrefix + "_BatchUpdate"
-  plotGraph.plot1(filename+"Sigma", sigmas, "sigmas")
-
-  return sigmas
+        if updateC % 1000 == 1:
+          filename = figurePath + namePrefix + "_epoch" + str(epoch) + "_update" + str((i,j))
+          plotGraph.plot1(filename + "Sigma", sigmasCopy, "sigmas_" + str((i,j)))
+          plotGraph.plot4(filename, m_true, "m_true", gm, "gm", L_true, "L_true", L, "L")
+          plotGraph.plotLine(figurePath + namePrefix + "_err", res, 'Error per Steps -- Validation')
+  return sigmasCopy

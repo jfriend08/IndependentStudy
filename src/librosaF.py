@@ -5,6 +5,8 @@ import numpy as np
 
 import librosa.core
 import librosa.util
+import os, warnings
+import scipy.io.wavfile as wav
 
 #-- Chroma --#
 def logfsgram(y=None, sr=22050, S=None, n_fft=4096, hop_length=512, **kwargs):
@@ -582,3 +584,56 @@ def sync(data, frames, aggregate=None):
 
     return data_agg, frameConversion
 
+def mp32np(fname):
+  '''
+  Convertng mp3 to tmp wav, and load it into numpy
+  Installation of lame is required
+  '''
+  oname = 'temp.wav'
+  cmd = 'lame --decode {0} {1}'.format( fname,oname )
+  os.system(cmd)
+  return wav.read(oname)
+
+def loadInterval2Frame(path, sr=22050, frameConversion=None):
+  '''
+  converting time to frame interval
+  if frameConversion provided, will do frame-to-frame conversion
+  '''
+  def t2f(x):
+    return librosa.core.time_to_frames(x, sr=sr, hop_length=512, n_fft=None)
+
+  def f2f(x):
+    def getFrame(myin):
+      if myin < 0 or myin > frameConversion[-1][1][1]:
+        raise ValueError('frame index error')
+      for newI, prevIs in frameConversion:
+        if prevIs[0] <= myin <= prevIs[1]:
+          return newI
+
+    x = map(getFrame,x)
+
+    if all([elm==x[0] for elm in x]):
+      warnings.warn("Warning: Points are in the same frame after conversion")
+      return []
+    return x
+
+  text_file = open(path, "r")
+  tmpInt, interval = [], []
+
+  #First pass. Get all annotation
+  for line in text_file:
+    tmpInt += [line.rstrip().split()]
+
+  #Second pass. Get all intervals
+  for i in xrange(len(tmpInt)-1):
+    interval += [ [np.array(map(float,[tmpInt[i][0], tmpInt[i+1][0]])).astype(float), tmpInt[i][1]] ]
+
+  #Time to frame conversion
+  interval = [[np.apply_along_axis(t2f, 0, elm[0]), elm[1]] for elm in interval]
+
+  if frameConversion != None:
+    interval = [[np.apply_along_axis(f2f, 0, elm[0]), elm[1]] for elm in interval]
+    print interval
+    interval = [elm for elm in interval if elm[0].size!=0]
+    print interval
+  return interval
