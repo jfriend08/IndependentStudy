@@ -58,9 +58,6 @@ def gaussianKernel(m, c=0.5):
   return res
 
 def featureQ2GaussianMatrix(feature, Q):
-  if not (sigmas==np.transpose(sigmas)).all():
-    raise ValueError('input sigmas matrix not symmetirc')
-
   if not (feature.shape[1]==Q.shape[0]):
     raise ValueError('Q not match with feature')
 
@@ -69,8 +66,9 @@ def featureQ2GaussianMatrix(feature, Q):
   m = np.diag(a, 0)
   for i in xrange(nSample):
     for j in xrange(i+1, nSample):
-      diff = features[i,:] - features[j,:]
-      val = diff*diff*Q
+      diff = feature[i,:] - feature[j,:]
+      val = (diff*diff*Q).sum()
+      # print "diff: %s, val: %s" % (diff, val)
       m[i,j] = val
       m[j,i] = val
   return m
@@ -86,12 +84,13 @@ def feature2GaussianMatrix(feature, sigmas):
     raise ValueError('input sigmas matrix not symmetirc')
 
   nSample, nFeature = feature.shape
+  minDiff, maxDiff = sys.float_info.max, sys.float_info.min
   a = np.ones((1, nSample))[0]
   m = np.diag(a, 0)
   for i in xrange(nSample):
     for j in xrange(i+1, nSample):
-      # diff = np.power(np.linalg.norm(feature[i]-feature[j]),2)
-      # val = np.exp(-diff/sigmas[i,j]**2)
+      diff = np.linalg.norm(feature[i]-feature[j])
+      minDiff, maxDiff = min(minDiff, diff), max(maxDiff, diff)
       val = gradient.w_ij(i, j, sigmas[i,j], feature) #call value from gradient module
       m[i,j] = val
       m[j,i] = val
